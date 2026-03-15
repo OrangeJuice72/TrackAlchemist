@@ -30,18 +30,20 @@ function App() {
 
   const genreLabel = useMemo(() => {
     const primaryLabel = GENRE_DATA[selectedGenre].label;
-
-    if (!secondaryGenre) {
-      return primaryLabel;
-    }
-
-    return `${primaryLabel} x ${GENRE_DATA[secondaryGenre].label}`;
+    return secondaryGenre ? `${primaryLabel} x ${GENRE_DATA[secondaryGenre].label}` : primaryLabel;
   }, [secondaryGenre, selectedGenre]);
 
   const handleGenerate = () => {
     setResult((previousResult) =>
       generateIdea(selectedGenre, secondaryGenre, lockedFields, previousResult)
     );
+  };
+
+  const updateResultField = (field, value) => {
+    setResult((currentResult) => ({
+      ...currentResult,
+      [field]: value
+    }));
   };
 
   const toggleLock = (field) => {
@@ -54,7 +56,6 @@ function App() {
   const handlePrimaryGenreChange = (event) => {
     const nextPrimaryGenre = event.target.value;
     const nextSecondaryGenre = nextPrimaryGenre === secondaryGenre ? '' : secondaryGenre;
-
     setSelectedGenre(nextPrimaryGenre);
     setSecondaryGenre(nextSecondaryGenre);
     setResult(generateIdea(nextPrimaryGenre, nextSecondaryGenre));
@@ -80,17 +81,17 @@ function App() {
           }
         : null,
       lockedFields,
-        generatedConcept: {
-          mainGenre: result.mainGenre,
-          flavorGenre: result.flavorGenre,
-          bpm: result.bpm,
-          scale: result.scale,
-          era: result.era,
-          instrumentationPalette: result.instrumentationPalette,
-          signatureSound: result.signatureSound,
-          energyFeel: result.energyFeel,
-          songStructure: result.songStructure
-        },
+      generatedConcept: {
+        mainGenre: result.mainGenre,
+        flavorGenre: result.flavorGenre,
+        bpm: result.bpm,
+        scale: result.scale,
+        era: result.era,
+        instrumentationPalette: result.instrumentationPalette,
+        signatureSound: result.signatureSound,
+        energyFeel: result.energyFeel,
+        songStructure: result.songStructure
+      },
       prompt:
         `Create an original instrumental track concept using the following parameters: ` +
         `${result.mainGenre} main genre blend, ${result.flavorGenre} flavor, ${result.bpm} BPM, ` +
@@ -114,8 +115,8 @@ function App() {
           <p className="eyebrow">Track concept generator</p>
           <h1>Song Instrumental Generator</h1>
           <p className="subtitle">
-            Blend up to two main genres, reroll concepts, and lock any field you want to keep
-            while the rest of the idea keeps evolving.
+            Blend up to two main genres, reroll concepts, edit any result, and lock the parts you
+            want to keep.
           </p>
         </header>
 
@@ -179,47 +180,57 @@ function App() {
           ) : null}
 
           <div className="result-grid">
-            <LockableResultCard
+            <EditableResultCard
               title="Flavor Genre"
               value={result.flavorGenre}
               isLocked={lockedFields.flavorGenre}
               onToggleLock={() => toggleLock('flavorGenre')}
+              onChange={(value) => updateResultField('flavorGenre', value)}
             />
-            <LockableResultCard
+            <EditableResultCard
               title="Scale"
               value={result.scale}
               isLocked={lockedFields.scale}
               onToggleLock={() => toggleLock('scale')}
+              onChange={(value) => updateResultField('scale', value)}
             />
-            <LockableResultCard
+            <EditableResultCard
               title="Signature Sound"
               value={result.signatureSound}
               isLocked={lockedFields.signatureSound}
               onToggleLock={() => toggleLock('signatureSound')}
+              onChange={(value) => updateResultField('signatureSound', value)}
+              multiline
             />
-            <LockableResultCard
+            <EditableResultCard
               title="Era"
               value={result.era}
               isLocked={lockedFields.era}
               onToggleLock={() => toggleLock('era')}
+              onChange={(value) => updateResultField('era', value)}
             />
-            <LockableResultCard
+            <EditableResultCard
               title="Energy Feel"
               value={result.energyFeel}
               isLocked={lockedFields.energyFeel}
               onToggleLock={() => toggleLock('energyFeel')}
+              onChange={(value) => updateResultField('energyFeel', value)}
             />
-            <LockableResultCard
+            <EditableResultCard
               title="Song Structure"
               value={result.songStructure}
               isLocked={lockedFields.songStructure}
               onToggleLock={() => toggleLock('songStructure')}
+              onChange={(value) => updateResultField('songStructure', value)}
+              multiline
             />
-            <LockableResultCard
+            <EditableResultCard
               title="BPM"
-              value={`${result.bpm} BPM`}
+              value={String(result.bpm)}
               isLocked={lockedFields.bpm}
               onToggleLock={() => toggleLock('bpm')}
+              onChange={(value) => updateResultField('bpm', value.replace(/[^\d]/g, ''))}
+              inputMode="numeric"
             />
           </div>
 
@@ -231,11 +242,19 @@ function App() {
                 onClick={() => toggleLock('instrumentationPalette')}
               />
             </div>
-            <ul>
-              {result.instrumentationPalette.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
+            <textarea
+              className="result-input result-textarea"
+              value={result.instrumentationPalette.join(', ')}
+              onChange={(event) =>
+                updateResultField(
+                  'instrumentationPalette',
+                  event.target.value
+                    .split(',')
+                    .map((item) => item.trim())
+                    .filter(Boolean)
+                )
+              }
+            />
           </div>
         </section>
       </div>
@@ -243,14 +262,35 @@ function App() {
   );
 }
 
-function LockableResultCard({ title, value, isLocked, onToggleLock }) {
+function EditableResultCard({
+  title,
+  value,
+  isLocked,
+  onToggleLock,
+  onChange,
+  multiline = false,
+  inputMode
+}) {
   return (
     <article className="result-card">
       <div className="card-heading">
         <p>{title}</p>
         <LockButton isLocked={isLocked} onClick={onToggleLock} />
       </div>
-      <h3>{value}</h3>
+      {multiline ? (
+        <textarea
+          className="result-input result-textarea"
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+        />
+      ) : (
+        <input
+          className="result-input"
+          value={value}
+          inputMode={inputMode}
+          onChange={(event) => onChange(event.target.value)}
+        />
+      )}
     </article>
   );
 }
