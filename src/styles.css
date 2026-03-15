@@ -171,8 +171,8 @@ textarea {
 
 .hero-logo-shell {
   position: relative;
-  width: min(100%, 390px);
-  padding: 18px;
+  width: min(100%, 320px);
+  padding: 14px;
   border-radius: 28px;
   background:
     radial-gradient(circle at 28% 68%, rgba(83, 217, 255, 0.2), transparent 30%),
@@ -197,6 +197,8 @@ textarea {
 .hero-logo {
   display: block;
   width: 100%;
+  max-width: 290px;
+  margin: 0 auto;
   height: auto;
 }
 
