@@ -7,6 +7,7 @@ const lockableFields = [
   'flavorGenre',
   'bpm',
   'scale',
+  'era',
   'signatureSound',
   'energyFeel',
   'songStructure',
@@ -79,22 +80,22 @@ function App() {
           }
         : null,
       lockedFields,
-      generatedConcept: {
-        mainGenre: result.mainGenre,
-        flavorGenre: result.flavorGenre,
-        bpm: result.bpm,
-        scale: result.scale,
-        instrumentationPalette: result.instrumentationPalette,
-        signatureSound: result.signatureSound,
-        energyFeel: result.energyFeel,
-        songStructure: result.songStructure
-      },
+        generatedConcept: {
+          mainGenre: result.mainGenre,
+          flavorGenre: result.flavorGenre,
+          bpm: result.bpm,
+          scale: result.scale,
+          era: result.era,
+          instrumentationPalette: result.instrumentationPalette,
+          signatureSound: result.signatureSound,
+          energyFeel: result.energyFeel,
+          songStructure: result.songStructure
+        },
       prompt:
         `Create an original instrumental track concept using the following parameters: ` +
         `${result.mainGenre} main genre blend, ${result.flavorGenre} flavor, ${result.bpm} BPM, ` +
-        `${result.scale} scale, instrumentation palette of ${result.instrumentationPalette.join(', ')}, ` +
-        `signature sound "${result.signatureSound}", energy feel "${result.energyFeel}", and song structure ` +
-        `"${result.songStructure}".`
+        `${result.scale} scale, ${result.era} aesthetic, instrumentation palette of ${result.instrumentationPalette.join(', ')}, ` +
+        `signature sound "${result.signatureSound}", energy feel "${result.energyFeel}", and song structure "${result.songStructure}".`
     };
 
     try {
@@ -195,6 +196,12 @@ function App() {
               value={result.signatureSound}
               isLocked={lockedFields.signatureSound}
               onToggleLock={() => toggleLock('signatureSound')}
+            />
+            <LockableResultCard
+              title="Era"
+              value={result.era}
+              isLocked={lockedFields.era}
+              onToggleLock={() => toggleLock('era')}
             />
             <LockableResultCard
               title="Energy Feel"

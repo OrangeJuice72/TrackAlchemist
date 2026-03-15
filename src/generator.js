@@ -1,4 +1,4 @@
-import { GENRE_DATA, SONG_STRUCTURES } from './data.js';
+import { ERAS, GENRE_DATA, SONG_STRUCTURES } from './data.js';
 
 function pick(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
@@ -63,6 +63,7 @@ export function generateIdea(primaryGenreKey, secondaryGenreKey, locks = {}, pre
         ? previousResult.signatureSound
         : pick(genre.signatureSounds),
     energyFeel: locks.energyFeel && previousResult ? previousResult.energyFeel : pick(genre.energyFeels),
+    era: locks.era && previousResult ? previousResult.era : pick(ERAS),
     songStructure:
       locks.songStructure && previousResult ? previousResult.songStructure : pick(SONG_STRUCTURES)
   };

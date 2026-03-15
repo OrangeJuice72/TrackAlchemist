@@ -4,29 +4,52 @@
   background: #120d1d;
   line-height: 1.5;
   font-weight: 400;
+  overscroll-behavior: none;
+  -webkit-text-size-adjust: 100%;
 }
 
 * {
   box-sizing: border-box;
 }
 
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+html {
+  height: 100%;
+  background: #120d1d;
+  overscroll-behavior: none;
+}
+
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  min-height: 100dvh;
   background:
     radial-gradient(circle at top, rgba(143, 92, 255, 0.28), transparent 35%),
     linear-gradient(160deg, #120d1d 0%, #1d1330 45%, #0d0b14 100%);
+  overscroll-behavior-y: none;
+  -webkit-overflow-scrolling: touch;
 }
 
 button,
 select {
   font: inherit;
+  touch-action: manipulation;
 }
 
 .app-shell {
   min-height: 100vh;
-  padding: 32px 18px;
+  min-height: 100dvh;
+  padding:
+    max(20px, env(safe-area-inset-top))
+    max(14px, env(safe-area-inset-right))
+    max(20px, env(safe-area-inset-bottom))
+    max(14px, env(safe-area-inset-left));
 }
 
 .container {
@@ -105,6 +128,7 @@ label {
 
 select {
   width: 100%;
+  min-height: 50px;
   padding: 14px 16px;
   border-radius: 14px;
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -115,6 +139,7 @@ select {
 .generate-button {
   border: none;
   border-radius: 16px;
+  min-height: 50px;
   padding: 14px 22px;
   color: white;
   background: linear-gradient(135deg, #8f5cff, #bb86ff);
@@ -167,6 +192,7 @@ select {
 .copy-button {
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 16px;
+  min-height: 50px;
   padding: 12px 18px;
   color: white;
   background: rgba(255, 255, 255, 0.08);
@@ -226,6 +252,7 @@ select {
   background: rgba(255, 255, 255, 0.06);
   color: #f5efff;
   border-radius: 999px;
+  min-height: 34px;
   padding: 6px 12px;
   cursor: pointer;
   font-size: 0.78rem;
@@ -250,7 +277,11 @@ select {
 
 @media (max-width: 640px) {
   .app-shell {
-    padding: 18px 12px;
+    padding:
+      max(14px, env(safe-area-inset-top))
+      max(12px, env(safe-area-inset-right))
+      max(18px, env(safe-area-inset-bottom))
+      max(12px, env(safe-area-inset-left));
   }
 
   .controls-panel,
@@ -266,5 +297,9 @@ select {
 
   .result-actions {
     justify-content: start;
+  }
+
+  .result-grid {
+    grid-template-columns: 1fr;
   }
 }
