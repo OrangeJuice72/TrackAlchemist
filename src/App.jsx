@@ -110,14 +110,25 @@ function App() {
 
   return (
     <div className="app-shell">
+      <div className="background-orb background-orb-one" aria-hidden="true" />
+      <div className="background-orb background-orb-two" aria-hidden="true" />
+      <div className="background-grid" aria-hidden="true" />
       <div className="container">
         <header className="hero-card">
-          <p className="eyebrow">Track concept generator</p>
-          <h1>Song Instrumental Generator</h1>
+          <div className="hero-topline">
+            <p className="eyebrow">Track concept generator</p>
+            <span className="hero-pill">Hybrid-ready</span>
+          </div>
+          <h1>TrackAlchemist</h1>
           <p className="subtitle">
             Blend up to two main genres, reroll concepts, edit any result, and lock the parts you
             want to keep.
           </p>
+          <div className="hero-stats">
+            <HeroStat label="Main Genres" value="25" />
+            <HeroStat label="Flavor Genres" value="100" />
+            <HeroStat label="Song Structures" value="36" />
+          </div>
         </header>
 
         <section className="panel controls-panel">
@@ -178,6 +189,14 @@ function App() {
                 : 'Clipboard copy failed. Try again in a secure browser tab.'}
             </p>
           ) : null}
+
+          <div className="prompt-preview">
+            <p className="result-label">Prompt Snapshot</p>
+            <p>
+              {result.era} {result.flavorGenre.toLowerCase()} energy at {result.bpm} BPM with{' '}
+              {result.signatureSound.toLowerCase()}.
+            </p>
+          </div>
 
           <div className="result-grid">
             <EditableResultCard
@@ -258,6 +277,15 @@ function App() {
           </div>
         </section>
       </div>
+    </div>
+  );
+}
+
+function HeroStat({ label, value }) {
+  return (
+    <div className="hero-stat">
+      <strong>{value}</strong>
+      <span>{label}</span>
     </div>
   );
 }
