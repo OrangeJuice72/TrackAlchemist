@@ -5,20 +5,12 @@ import { generateIdea } from './generator.js';
 const genreEntries = Object.entries(GENRE_DATA);
 const initialSeed = 'TA-001';
 const favoritesStorageKey = 'trackalchemist-favorites';
-const customPoolsStorageKey = 'trackalchemist-custom-pools';
 const promptTemplates = [
   { key: 'generic', label: 'Generic Prompt' },
   { key: 'chatgpt', label: 'ChatGPT Brief' },
   { key: 'suno', label: 'Suno Prompt' },
   { key: 'udio', label: 'Udio Prompt' },
   { key: 'producer', label: 'Producer Brief' }
-];
-const customPoolFields = [
-  { key: 'flavorGenres', label: 'Custom Flavor Genres' },
-  { key: 'signatureSounds', label: 'Custom Signature Sounds' },
-  { key: 'moodTags', label: 'Custom Mood Tags' },
-  { key: 'songStructures', label: 'Custom Song Structures' },
-  { key: 'eras', label: 'Custom Eras' }
 ];
 const lockableFields = [
   'flavorGenre',
@@ -43,13 +35,6 @@ function createEmptyLocks() {
   }, {});
 }
 
-function createEmptyCustomPools() {
-  return customPoolFields.reduce((pools, field) => {
-    pools[field.key] = [];
-    return pools;
-  }, {});
-}
-
 function readFavorites() {
   if (typeof window === 'undefined') {
     return [];
@@ -62,27 +47,8 @@ function readFavorites() {
   }
 }
 
-function readCustomPools() {
-  if (typeof window === 'undefined') {
-    return createEmptyCustomPools();
-  }
-
-  try {
-    return {
-      ...createEmptyCustomPools(),
-      ...JSON.parse(window.localStorage.getItem(customPoolsStorageKey) ?? '{}')
-    };
-  } catch {
-    return createEmptyCustomPools();
-  }
-}
-
 function persistFavorites(favorites) {
   window.localStorage.setItem(favoritesStorageKey, JSON.stringify(favorites));
-}
-
-function persistCustomPools(customPools) {
-  window.localStorage.setItem(customPoolsStorageKey, JSON.stringify(customPools));
 }
 
 function buildIntensityText(intensityMap) {
@@ -156,16 +122,14 @@ function buildPrompt({ premise, referenceArtists, result, promptTemplate, seedIn
 }
 
 function App() {
-  const initialCustomPools = readCustomPools();
   const [selectedGenre, setSelectedGenre] = useState(genreEntries[0][0]);
   const [secondaryGenre, setSecondaryGenre] = useState('');
   const [blendWeight, setBlendWeight] = useState(65);
   const [seedInput, setSeedInput] = useState(initialSeed);
   const [promptTemplate, setPromptTemplate] = useState('generic');
   const [lockedFields, setLockedFields] = useState(createEmptyLocks);
-  const [customPools, setCustomPools] = useState(initialCustomPools);
   const [result, setResult] = useState(() =>
-    generateIdea(genreEntries[0][0], '', {}, null, 65, initialCustomPools, initialSeed)
+    generateIdea(genreEntries[0][0], '', {}, null, 65, {}, initialSeed)
   );
   const [premise, setPremise] = useState('');
   const [referenceArtists, setReferenceArtists] = useState('');
@@ -191,25 +155,24 @@ function App() {
 
   const generateWithState = ({
     nextPrimaryGenre = selectedGenre,
-    nextSecondaryGenre = secondaryGenre,
-    nextLocks = lockedFields,
-    previousResult = null,
-    nextWeight = blendWeight,
-    nextCustomPools = customPools,
-    nextSeed = seedInput
-  } = {}) => {
-    const resolvedSeed = nextSeed || `TA-${Date.now()}`;
-    setSeedInput(resolvedSeed);
+      nextSecondaryGenre = secondaryGenre,
+      nextLocks = lockedFields,
+      previousResult = null,
+      nextWeight = blendWeight,
+      nextSeed = seedInput
+    } = {}) => {
+      const resolvedSeed = nextSeed || `TA-${Date.now()}`;
+      setSeedInput(resolvedSeed);
     return generateIdea(
       nextPrimaryGenre,
       nextSecondaryGenre,
-      nextLocks,
-      previousResult,
-      nextWeight,
-      nextCustomPools,
-      resolvedSeed
-    );
-  };
+        nextLocks,
+        previousResult,
+        nextWeight,
+        {},
+        resolvedSeed
+      );
+    };
 
   const handleGenerate = () => {
     setResult((previousResult) => generateWithState({ previousResult }));
@@ -238,8 +201,7 @@ function App() {
       generateWithState({
         nextPrimaryGenre,
         nextSecondaryGenre,
-        nextLocks: {},
-        previousResult: null
+        nextLocks: {}
       })
     );
   };
@@ -250,8 +212,7 @@ function App() {
     setResult(
       generateWithState({
         nextSecondaryGenre,
-        nextLocks: {},
-        previousResult: null
+        nextLocks: {}
       })
     );
   };
@@ -262,34 +223,13 @@ function App() {
     setResult(
       generateWithState({
         nextWeight,
-        nextLocks: {},
-        previousResult: null
+        nextLocks: {}
       })
     );
   };
 
   const handleSeedChange = (event) => {
     setSeedInput(event.target.value);
-  };
-
-  const handleCustomPoolChange = (field, value) => {
-    const nextPools = {
-      ...customPools,
-      [field]: value
-        .split('\n')
-        .map((item) => item.trim())
-        .filter(Boolean)
-    };
-
-    setCustomPools(nextPools);
-    persistCustomPools(nextPools);
-    setResult(
-      generateWithState({
-        nextCustomPools: nextPools,
-        nextLocks: {},
-        previousResult: null
-      })
-    );
   };
 
   const handleCopyJsonPrompt = async () => {
@@ -311,7 +251,6 @@ function App() {
       lockedFields,
       premise,
       referenceArtists,
-      customPools,
       generatedConcept: {
         mainGenre: result.mainGenre,
         flavorGenre: result.flavorGenre,
@@ -363,7 +302,6 @@ function App() {
         premise,
         referenceArtists,
         lockedFields,
-        customPools,
         result
       },
       ...favorites
@@ -382,8 +320,6 @@ function App() {
     setPremise(favorite.premise);
     setReferenceArtists(favorite.referenceArtists);
     setLockedFields(favorite.lockedFields);
-    setCustomPools(favorite.customPools ?? createEmptyCustomPools());
-    persistCustomPools(favorite.customPools ?? createEmptyCustomPools());
     setResult(favorite.result);
   };
 
@@ -767,28 +703,6 @@ function App() {
               ))}
             </div>
           )}
-        </section>
-
-        <section className="panel favorites-panel">
-          <div className="card-heading">
-            <div>
-              <p className="result-label">Custom Pools</p>
-              <h3>Generator Add-Ons</h3>
-            </div>
-          </div>
-          <div className="custom-pools-grid">
-            {customPoolFields.map((field) => (
-              <div key={field.key} className="arrangement-item">
-                <strong>{field.label}</strong>
-                <textarea
-                  className="result-input result-textarea"
-                  value={customPools[field.key].join('\n')}
-                  onChange={(event) => handleCustomPoolChange(field.key, event.target.value)}
-                  placeholder="One item per line"
-                />
-              </div>
-            ))}
-          </div>
         </section>
       </div>
     </div>
