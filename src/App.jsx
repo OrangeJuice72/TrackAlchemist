@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import logoImage from '../logo.png';
 import { GENRE_DATA } from './data.js';
 import { generateIdea } from './generator.js';
 
@@ -363,7 +364,7 @@ function App() {
           </div>
           <div className="hero-brand">
             <div className="hero-logo-shell">
-              <img className="hero-logo" src="/logo.png" alt="TrackAlchemist logo" />
+              <img className="hero-logo" src={logoImage} alt="TrackAlchemist logo" />
             </div>
           </div>
         </header>
