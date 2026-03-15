@@ -336,13 +336,36 @@ function App() {
       <div className="background-grid" aria-hidden="true" />
       <div className="container">
         <header className="hero-card">
-          <div className="hero-topline">
-            <p className="eyebrow">Track Generator</p>
+          <div className="hero-copy">
+            <div className="hero-topline">
+              <p className="eyebrow">Track Generator</p>
+              <span className="hero-chip">Neon Concept Lab</span>
+            </div>
+            <h1>TrackAlchemist</h1>
+            <p className="subtitle">
+              Build song-ready concepts fast with cinematic neon energy, hybrid genre direction,
+              and production-ready structure.
+            </p>
+            <div className="hero-mini-stats">
+              <div className="hero-stat-pill">
+                <strong>25</strong>
+                <span>Main Genres</span>
+              </div>
+              <div className="hero-stat-pill">
+                <strong>Seeded</strong>
+                <span>Repeatable</span>
+              </div>
+              <div className="hero-stat-pill">
+                <strong>5</strong>
+                <span>Prompt Modes</span>
+              </div>
+            </div>
           </div>
-          <h1>TrackAlchemist</h1>
-          <p className="subtitle">
-            Build song-ready concepts fast.
-          </p>
+          <div className="hero-brand">
+            <div className="hero-logo-shell">
+              <img className="hero-logo" src="/logo.png" alt="TrackAlchemist logo" />
+            </div>
+          </div>
         </header>
 
         <section className="panel controls-panel">
