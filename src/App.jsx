@@ -26,6 +26,7 @@ function App() {
   const [secondaryGenre, setSecondaryGenre] = useState('');
   const [lockedFields, setLockedFields] = useState(createEmptyLocks);
   const [result, setResult] = useState(() => generateIdea(genreEntries[0][0], ''));
+  const [premise, setPremise] = useState('');
   const [copyState, setCopyState] = useState('idle');
 
   const genreLabel = useMemo(() => {
@@ -69,7 +70,7 @@ function App() {
 
   const handleCopyPrompt = async () => {
     const payload = {
-      promptType: 'instrumental-track-concept',
+      promptType: 'track-concept',
       primaryGenre: {
         key: selectedGenre,
         label: GENRE_DATA[selectedGenre].label
@@ -81,6 +82,7 @@ function App() {
           }
         : null,
       lockedFields,
+      premise,
       generatedConcept: {
         mainGenre: result.mainGenre,
         flavorGenre: result.flavorGenre,
@@ -93,7 +95,8 @@ function App() {
         songStructure: result.songStructure
       },
       prompt:
-        `Create an original instrumental track concept using the following parameters: ` +
+        `Create an original track concept using the following parameters: ` +
+        `${premise ? `Premise: "${premise}". ` : ''}` +
         `${result.mainGenre} main genre blend, ${result.flavorGenre} flavor, ${result.bpm} BPM, ` +
         `${result.scale} scale, ${result.era} aesthetic, instrumentation palette of ${result.instrumentationPalette.join(', ')}, ` +
         `signature sound "${result.signatureSound}", energy feel "${result.energyFeel}", and song structure "${result.songStructure}".`
@@ -158,8 +161,19 @@ function App() {
                     <option key={key} value={key}>
                       {value.label}
                     </option>
-                  ))}
+                ))}
               </select>
+            </div>
+
+            <div className="field-group field-group-wide">
+              <label htmlFor="premise-input">Premise</label>
+              <textarea
+                id="premise-input"
+                className="result-input result-textarea"
+                value={premise}
+                onChange={(event) => setPremise(event.target.value)}
+                placeholder="What is the song about?"
+              />
             </div>
           </div>
 
@@ -193,6 +207,7 @@ function App() {
           <div className="prompt-preview">
             <p className="result-label">Prompt Snapshot</p>
             <p>
+              {premise ? `${premise} ` : ''}
               {result.era} {result.flavorGenre.toLowerCase()} energy at {result.bpm} BPM with{' '}
               {result.signatureSound.toLowerCase()}.
             </p>
