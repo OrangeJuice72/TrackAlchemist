@@ -4,7 +4,6 @@ import { GENRE_DATA } from './data.js';
 import { generateIdea } from './generator.js';
 
 const genreEntries = Object.entries(GENRE_DATA);
-const initialSeed = 'TA-001';
 const favoritesStorageKey = 'trackalchemist-favorites';
 const promptTemplates = [
   { key: 'generic', label: 'Generic Prompt' },
@@ -29,11 +28,42 @@ const lockableFields = [
   'intensityMap'
 ];
 
+const promptFieldDefinitions = [
+  { key: 'premise', label: 'Premise' },
+  { key: 'referenceArtists', label: 'References' },
+  { key: 'mainGenre', label: 'Main Genre' },
+  { key: 'flavorGenre', label: 'Flavor Genre' },
+  { key: 'bpm', label: 'BPM' },
+  { key: 'scale', label: 'Scale' },
+  { key: 'keyCenter', label: 'Key Center' },
+  { key: 'chordProgression', label: 'Chord Progression' },
+  { key: 'era', label: 'Era' },
+  { key: 'moodTags', label: 'Mood Tags' },
+  { key: 'energyFeel', label: 'Energy Feel' },
+  { key: 'songStructure', label: 'Song Structure' },
+  { key: 'instrumentationPalette', label: 'Instrumentation' },
+  { key: 'signatureSound', label: 'Signature Sound' },
+  { key: 'arrangement', label: 'Arrangement' },
+  { key: 'intensityMap', label: 'Intensity Map' },
+  { key: 'seed', label: 'Seed' }
+];
+
 function createEmptyLocks() {
   return lockableFields.reduce((locks, field) => {
     locks[field] = false;
     return locks;
   }, {});
+}
+
+function createPromptInclusions() {
+  return promptFieldDefinitions.reduce((inclusions, field) => {
+    inclusions[field.key] = true;
+    return inclusions;
+  }, {});
+}
+
+function createRandomSeed() {
+  return `TA-${Math.random().toString(36).slice(2, 10).toUpperCase()}`;
 }
 
 function readFavorites() {
@@ -60,75 +90,162 @@ function buildArrangementText(arrangement) {
   return arrangement.map((item) => `${item.section}: ${item.note}`).join(' ');
 }
 
-function buildPrompt({ premise, referenceArtists, result, promptTemplate, seedInput }) {
-  const referenceText = referenceArtists ? `Reference artists or producers: ${referenceArtists}. ` : '';
-  const premiseText = premise ? `Premise: "${premise}". ` : '';
-  const moodText = result.moodTags.length > 0 ? `Mood tags: ${result.moodTags.join(', ')}. ` : '';
+function buildPrompt({
+  premise,
+  referenceArtists,
+  result,
+  promptTemplate,
+  seedInput,
+  promptInclusions
+}) {
+  const isIncluded = (field) => promptInclusions[field] !== false;
   const intensityText = buildIntensityText(result.intensityMap);
   const arrangementText = buildArrangementText(result.arrangement);
+  const moodText = result.moodTags.length > 0 ? result.moodTags.join(', ') : '';
+  const instrumentationText = result.instrumentationPalette.join(', ');
+  const baseContext = [];
+
+  if (isIncluded('premise') && premise) {
+    baseContext.push(`Premise: "${premise}".`);
+  }
+
+  if (isIncluded('referenceArtists') && referenceArtists) {
+    baseContext.push(`Reference artists or producers: ${referenceArtists}.`);
+  }
 
   switch (promptTemplate) {
-    case 'chatgpt':
-      return (
-        `Create a polished song brief and production plan. ` +
-        `${premiseText}${referenceText}` +
-        `Genre blend: ${result.mainGenre}. Flavor genre: ${result.flavorGenre}. ` +
-        `Tempo: ${result.bpm} BPM. Key center: ${result.keyCenter}. Scale: ${result.scale}. ` +
-        `Chord progression: ${result.chordProgression}. Era: ${result.era}. ` +
-        `Mood tags: ${result.moodTags.join(', ')}. Energy feel: ${result.energyFeel}. ` +
-        `Instrumentation palette: ${result.instrumentationPalette.join(', ')}. ` +
-        `Signature sound: ${result.signatureSound}. Song structure: ${result.songStructure}. ` +
-        `Intensity map: ${intensityText}. Arrangement notes: ${arrangementText}. Seed: ${seedInput}.`
-      );
-    case 'suno':
-      return (
-        `${premiseText}` +
-        `${referenceText}` +
-        `${result.mainGenre}, ${result.flavorGenre}, ${result.era}, ${result.energyFeel}, ` +
-        `${result.bpm} BPM, ${result.keyCenter}, chord progression ${result.chordProgression}, ` +
-        `moods ${result.moodTags.join(', ')}, signature sound ${result.signatureSound}, ` +
-        `instrumentation ${result.instrumentationPalette.join(', ')}. ` +
-        `Structure: ${result.songStructure}. Intensity: ${intensityText}.`
-      );
-    case 'udio':
-      return (
-        `Song prompt: ${premiseText}${referenceText}` +
-        `${result.mainGenre} blend with ${result.flavorGenre} flavor, ${result.era} tone, ` +
-        `${result.bpm} BPM in ${result.keyCenter}, progression ${result.chordProgression}. ` +
-        `Use ${result.instrumentationPalette.join(', ')} with ${result.signatureSound}. ` +
-        `Moods: ${result.moodTags.join(', ')}. Energy: ${result.energyFeel}. ` +
-        `Structure ${result.songStructure}. Intensity map ${intensityText}.`
-      );
-    case 'producer':
-      return (
-        `Producer brief. ${premiseText}${referenceText}` +
-        `Blend ${result.mainGenre}; key ${result.keyCenter}; progression ${result.chordProgression}; ` +
-        `tempo ${result.bpm}; era ${result.era}; moods ${result.moodTags.join(', ')}; ` +
-        `energy ${result.energyFeel}; signature ${result.signatureSound}; ` +
-        `palette ${result.instrumentationPalette.join(', ')}; structure ${result.songStructure}; ` +
-        `intensity ${intensityText}; arrangement ${arrangementText}.`
-      );
-    default:
-      return (
-        `Create an original track concept. ` +
-        `${premiseText}${referenceText}` +
-        `${result.mainGenre} genre blend, ${result.flavorGenre} flavor, ${result.bpm} BPM, ` +
-        `${result.keyCenter}, ${result.scale} scale, chord progression ${result.chordProgression}, ` +
-        `${result.era} aesthetic, instrumentation palette of ${result.instrumentationPalette.join(', ')}, ` +
-        `signature sound "${result.signatureSound}", energy feel "${result.energyFeel}", ` +
-        `song structure "${result.songStructure}". ${moodText}` +
-        `Intensity map: ${intensityText}. Arrangement notes: ${arrangementText}`
-      );
+    case 'chatgpt': {
+      const parts = ['Create a polished song brief and production plan.', ...baseContext];
+      if (isIncluded('mainGenre')) parts.push(`Genre blend: ${result.mainGenre}.`);
+      if (isIncluded('flavorGenre')) parts.push(`Flavor genre: ${result.flavorGenre}.`);
+      if (isIncluded('bpm')) parts.push(`Tempo: ${result.bpm} BPM.`);
+      if (isIncluded('keyCenter')) parts.push(`Key center: ${result.keyCenter}.`);
+      if (isIncluded('scale')) parts.push(`Scale: ${result.scale}.`);
+      if (isIncluded('chordProgression')) parts.push(`Chord progression: ${result.chordProgression}.`);
+      if (isIncluded('era')) parts.push(`Era: ${result.era}.`);
+      if (isIncluded('moodTags') && moodText) parts.push(`Mood tags: ${moodText}.`);
+      if (isIncluded('energyFeel')) parts.push(`Energy feel: ${result.energyFeel}.`);
+      if (isIncluded('instrumentationPalette')) {
+        parts.push(`Instrumentation palette: ${instrumentationText}.`);
+      }
+      if (isIncluded('signatureSound')) parts.push(`Signature sound: ${result.signatureSound}.`);
+      if (isIncluded('songStructure')) parts.push(`Song structure: ${result.songStructure}.`);
+      if (isIncluded('intensityMap')) parts.push(`Intensity map: ${intensityText}.`);
+      if (isIncluded('arrangement')) parts.push(`Arrangement notes: ${arrangementText}.`);
+      if (isIncluded('seed')) parts.push(`Seed: ${seedInput}.`);
+      return parts.join(' ');
+    }
+    case 'suno': {
+      const fragments = [...baseContext];
+      if (isIncluded('mainGenre')) fragments.push(result.mainGenre);
+      if (isIncluded('flavorGenre')) fragments.push(result.flavorGenre);
+      if (isIncluded('era')) fragments.push(result.era);
+      if (isIncluded('energyFeel')) fragments.push(result.energyFeel);
+      if (isIncluded('bpm')) fragments.push(`${result.bpm} BPM`);
+      if (isIncluded('keyCenter')) fragments.push(result.keyCenter);
+      if (isIncluded('scale')) fragments.push(`${result.scale} scale`);
+      if (isIncluded('chordProgression')) fragments.push(`chord progression ${result.chordProgression}`);
+      if (isIncluded('moodTags') && moodText) fragments.push(`moods ${moodText}`);
+      if (isIncluded('signatureSound')) fragments.push(`signature sound ${result.signatureSound}`);
+      if (isIncluded('instrumentationPalette')) {
+        fragments.push(`instrumentation ${instrumentationText}`);
+      }
+
+      const parts = [];
+      if (fragments.length > 0) parts.push(`${fragments.join(', ')}.`);
+      if (isIncluded('songStructure')) parts.push(`Structure: ${result.songStructure}.`);
+      if (isIncluded('intensityMap')) parts.push(`Intensity: ${intensityText}.`);
+      if (isIncluded('arrangement')) parts.push(`Arrangement: ${arrangementText}.`);
+      if (isIncluded('seed')) parts.push(`Seed: ${seedInput}.`);
+      return parts.join(' ');
+    }
+    case 'udio': {
+      const parts = ['Song prompt:', ...baseContext];
+      if (isIncluded('mainGenre') && isIncluded('flavorGenre')) {
+        parts.push(`${result.mainGenre} blend with ${result.flavorGenre} flavor.`);
+      } else if (isIncluded('mainGenre')) {
+        parts.push(`${result.mainGenre} blend.`);
+      } else if (isIncluded('flavorGenre')) {
+        parts.push(`${result.flavorGenre} flavor.`);
+      }
+      if (isIncluded('era')) parts.push(`${result.era} tone.`);
+      if (isIncluded('bpm') && isIncluded('keyCenter')) {
+        parts.push(`${result.bpm} BPM in ${result.keyCenter}.`);
+      } else if (isIncluded('bpm')) {
+        parts.push(`${result.bpm} BPM.`);
+      } else if (isIncluded('keyCenter')) {
+        parts.push(`Key center ${result.keyCenter}.`);
+      }
+      if (isIncluded('scale')) parts.push(`Scale ${result.scale}.`);
+      if (isIncluded('chordProgression')) parts.push(`Progression ${result.chordProgression}.`);
+      if (isIncluded('instrumentationPalette') && isIncluded('signatureSound')) {
+        parts.push(`Use ${instrumentationText} with ${result.signatureSound}.`);
+      } else if (isIncluded('instrumentationPalette')) {
+        parts.push(`Use ${instrumentationText}.`);
+      } else if (isIncluded('signatureSound')) {
+        parts.push(`Feature ${result.signatureSound}.`);
+      }
+      if (isIncluded('moodTags') && moodText) parts.push(`Moods: ${moodText}.`);
+      if (isIncluded('energyFeel')) parts.push(`Energy: ${result.energyFeel}.`);
+      if (isIncluded('songStructure')) parts.push(`Structure ${result.songStructure}.`);
+      if (isIncluded('intensityMap')) parts.push(`Intensity map ${intensityText}.`);
+      if (isIncluded('arrangement')) parts.push(`Arrangement ${arrangementText}.`);
+      if (isIncluded('seed')) parts.push(`Seed ${seedInput}.`);
+      return parts.join(' ');
+    }
+    case 'producer': {
+      const parts = ['Producer brief.', ...baseContext];
+      if (isIncluded('mainGenre')) parts.push(`Blend ${result.mainGenre}.`);
+      if (isIncluded('flavorGenre')) parts.push(`Flavor ${result.flavorGenre}.`);
+      if (isIncluded('keyCenter')) parts.push(`Key ${result.keyCenter}.`);
+      if (isIncluded('scale')) parts.push(`Scale ${result.scale}.`);
+      if (isIncluded('chordProgression')) parts.push(`Progression ${result.chordProgression}.`);
+      if (isIncluded('bpm')) parts.push(`Tempo ${result.bpm}.`);
+      if (isIncluded('era')) parts.push(`Era ${result.era}.`);
+      if (isIncluded('moodTags') && moodText) parts.push(`Moods ${moodText}.`);
+      if (isIncluded('energyFeel')) parts.push(`Energy ${result.energyFeel}.`);
+      if (isIncluded('signatureSound')) parts.push(`Signature ${result.signatureSound}.`);
+      if (isIncluded('instrumentationPalette')) parts.push(`Palette ${instrumentationText}.`);
+      if (isIncluded('songStructure')) parts.push(`Structure ${result.songStructure}.`);
+      if (isIncluded('intensityMap')) parts.push(`Intensity ${intensityText}.`);
+      if (isIncluded('arrangement')) parts.push(`Arrangement ${arrangementText}.`);
+      if (isIncluded('seed')) parts.push(`Seed ${seedInput}.`);
+      return parts.join(' ');
+    }
+    default: {
+      const parts = ['Create an original track concept.', ...baseContext];
+      if (isIncluded('mainGenre')) parts.push(`${result.mainGenre} genre blend.`);
+      if (isIncluded('flavorGenre')) parts.push(`${result.flavorGenre} flavor.`);
+      if (isIncluded('bpm')) parts.push(`${result.bpm} BPM.`);
+      if (isIncluded('keyCenter')) parts.push(`${result.keyCenter}.`);
+      if (isIncluded('scale')) parts.push(`${result.scale} scale.`);
+      if (isIncluded('chordProgression')) parts.push(`Chord progression ${result.chordProgression}.`);
+      if (isIncluded('era')) parts.push(`${result.era} aesthetic.`);
+      if (isIncluded('instrumentationPalette')) {
+        parts.push(`Instrumentation palette of ${instrumentationText}.`);
+      }
+      if (isIncluded('signatureSound')) parts.push(`Signature sound "${result.signatureSound}".`);
+      if (isIncluded('energyFeel')) parts.push(`Energy feel "${result.energyFeel}".`);
+      if (isIncluded('songStructure')) parts.push(`Song structure "${result.songStructure}".`);
+      if (isIncluded('moodTags') && moodText) parts.push(`Mood tags: ${moodText}.`);
+      if (isIncluded('intensityMap')) parts.push(`Intensity map: ${intensityText}.`);
+      if (isIncluded('arrangement')) parts.push(`Arrangement notes: ${arrangementText}.`);
+      if (isIncluded('seed')) parts.push(`Seed: ${seedInput}.`);
+      return parts.join(' ');
+    }
   }
 }
 
 function App() {
+  const initialSeed = useMemo(() => createRandomSeed(), []);
   const [selectedGenre, setSelectedGenre] = useState(genreEntries[0][0]);
   const [secondaryGenre, setSecondaryGenre] = useState('');
   const [blendWeight, setBlendWeight] = useState(65);
   const [seedInput, setSeedInput] = useState(initialSeed);
+  const [seedLocked, setSeedLocked] = useState(false);
   const [promptTemplate, setPromptTemplate] = useState('generic');
   const [lockedFields, setLockedFields] = useState(createEmptyLocks);
+  const [promptInclusions, setPromptInclusions] = useState(createPromptInclusions);
   const [result, setResult] = useState(() =>
     generateIdea(genreEntries[0][0], '', {}, null, 65, {}, initialSeed)
   );
@@ -151,32 +268,39 @@ function App() {
     referenceArtists,
     result,
     promptTemplate,
-    seedInput
+    seedInput,
+    promptInclusions
   });
 
   const generateWithState = ({
     nextPrimaryGenre = selectedGenre,
-      nextSecondaryGenre = secondaryGenre,
-      nextLocks = lockedFields,
-      previousResult = null,
-      nextWeight = blendWeight,
-      nextSeed = seedInput
-    } = {}) => {
-      const resolvedSeed = nextSeed || `TA-${Date.now()}`;
-      setSeedInput(resolvedSeed);
+    nextSecondaryGenre = secondaryGenre,
+    nextLocks = lockedFields,
+    previousResult = null,
+    nextWeight = blendWeight,
+    nextSeed = seedInput,
+    useRandomSeed = false
+  } = {}) => {
+    const resolvedSeed = useRandomSeed ? createRandomSeed() : nextSeed || createRandomSeed();
+    setSeedInput(resolvedSeed);
     return generateIdea(
       nextPrimaryGenre,
       nextSecondaryGenre,
-        nextLocks,
-        previousResult,
-        nextWeight,
-        {},
-        resolvedSeed
-      );
-    };
+      nextLocks,
+      previousResult,
+      nextWeight,
+      {},
+      resolvedSeed
+    );
+  };
 
   const handleGenerate = () => {
-    setResult((previousResult) => generateWithState({ previousResult }));
+    setResult((previousResult) =>
+      generateWithState({
+        previousResult,
+        useRandomSeed: !seedLocked
+      })
+    );
   };
 
   const updateResultField = (field, value) => {
@@ -193,38 +317,54 @@ function App() {
     }));
   };
 
+  const togglePromptInclusion = (field) => {
+    setPromptInclusions((currentInclusions) => ({
+      ...currentInclusions,
+      [field]: !currentInclusions[field]
+    }));
+  };
+
   const handlePrimaryGenreChange = (event) => {
     const nextPrimaryGenre = event.target.value;
     const nextSecondaryGenre = nextPrimaryGenre === secondaryGenre ? '' : secondaryGenre;
+    const resetLocks = createEmptyLocks();
     setSelectedGenre(nextPrimaryGenre);
     setSecondaryGenre(nextSecondaryGenre);
+    setLockedFields(resetLocks);
     setResult(
       generateWithState({
         nextPrimaryGenre,
         nextSecondaryGenre,
-        nextLocks: {}
+        nextLocks: resetLocks,
+        useRandomSeed: !seedLocked
       })
     );
   };
 
   const handleSecondaryGenreChange = (event) => {
     const nextSecondaryGenre = event.target.value;
+    const resetLocks = createEmptyLocks();
     setSecondaryGenre(nextSecondaryGenre);
+    setLockedFields(resetLocks);
     setResult(
       generateWithState({
         nextSecondaryGenre,
-        nextLocks: {}
+        nextLocks: resetLocks,
+        useRandomSeed: !seedLocked
       })
     );
   };
 
   const handleWeightChange = (event) => {
     const nextWeight = Number(event.target.value);
+    const resetLocks = createEmptyLocks();
     setBlendWeight(nextWeight);
+    setLockedFields(resetLocks);
     setResult(
       generateWithState({
         nextWeight,
-        nextLocks: {}
+        nextLocks: resetLocks,
+        useRandomSeed: !seedLocked
       })
     );
   };
@@ -249,7 +389,9 @@ function App() {
           }
         : null,
       blendWeight,
+      seedLocked,
       lockedFields,
+      promptInclusions,
       premise,
       referenceArtists,
       generatedConcept: {
@@ -299,10 +441,12 @@ function App() {
         secondaryGenre,
         blendWeight,
         seedInput,
+        seedLocked,
         promptTemplate,
         premise,
         referenceArtists,
         lockedFields,
+        promptInclusions,
         result
       },
       ...favorites
@@ -316,11 +460,13 @@ function App() {
     setSelectedGenre(favorite.selectedGenre);
     setSecondaryGenre(favorite.secondaryGenre);
     setBlendWeight(favorite.blendWeight);
-    setSeedInput(favorite.seedInput ?? initialSeed);
+    setSeedInput(favorite.seedInput ?? createRandomSeed());
+    setSeedLocked(Boolean(favorite.seedLocked));
     setPromptTemplate(favorite.promptTemplate ?? 'generic');
     setPremise(favorite.premise);
     setReferenceArtists(favorite.referenceArtists);
-    setLockedFields(favorite.lockedFields);
+    setLockedFields(favorite.lockedFields ?? createEmptyLocks());
+    setPromptInclusions(favorite.promptInclusions ?? createPromptInclusions());
     setResult(favorite.result);
   };
 
@@ -458,13 +604,22 @@ function App() {
           <div className="meta-grid">
             <div className="field-group">
               <label htmlFor="seed-input">Generation Seed</label>
-              <input
-                id="seed-input"
-                className="result-input"
-                value={seedInput}
-                onChange={handleSeedChange}
-                placeholder="Type a repeatable seed"
-              />
+              <div className="seed-field">
+                <input
+                  id="seed-input"
+                  className="result-input"
+                  value={seedInput}
+                  onChange={handleSeedChange}
+                  placeholder="Type a repeatable seed"
+                />
+                <button
+                  type="button"
+                  className={`lock-button${seedLocked ? ' is-locked' : ''}`}
+                  onClick={() => setSeedLocked((currentValue) => !currentValue)}
+                >
+                  {seedLocked ? 'Seed Locked' : 'Seed Random'}
+                </button>
+              </div>
             </div>
 
             <div className="field-group">
@@ -486,6 +641,27 @@ function App() {
           <div className="prompt-preview">
             <p className="result-label">Prompt Snapshot</p>
             <p>{plainPrompt}</p>
+          </div>
+
+          <div className="palette-card">
+            <div className="card-heading">
+              <div>
+                <p className="result-label">Prompt Filters</p>
+                <h3>Included in Prompt</h3>
+              </div>
+            </div>
+            <div className="prompt-toggle-grid">
+              {promptFieldDefinitions.map((field) => (
+                <button
+                  key={field.key}
+                  type="button"
+                  className={`prompt-toggle${promptInclusions[field.key] ? ' is-active' : ''}`}
+                  onClick={() => togglePromptInclusion(field.key)}
+                >
+                  {field.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="result-grid">

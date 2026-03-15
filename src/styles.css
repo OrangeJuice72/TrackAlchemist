@@ -328,6 +328,7 @@ select:focus,
 
 .generate-button:hover,
 .copy-button:hover,
+.prompt-toggle:hover,
 .lock-button:hover {
   transform: translateY(-1px);
 }
@@ -392,6 +393,34 @@ select:focus,
 .prompt-preview p:last-child {
   margin: 0;
   color: #edf5ff;
+}
+
+.seed-field {
+  display: grid;
+  gap: 10px;
+}
+
+.prompt-toggle-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.prompt-toggle {
+  border: 1px solid rgba(162, 193, 255, 0.16);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-soft);
+  border-radius: 999px;
+  min-height: 36px;
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: border-color 120ms ease, background 120ms ease, transform 120ms ease;
+}
+
+.prompt-toggle.is-active {
+  background: linear-gradient(135deg, rgba(83, 217, 255, 0.16), rgba(169, 104, 255, 0.18));
+  border-color: rgba(83, 217, 255, 0.34);
+  color: #f4fbff;
 }
 
 .result-grid {
