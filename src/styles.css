@@ -275,6 +275,17 @@ label {
   font-weight: 600;
 }
 
+.label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.label-row label {
+  margin: 0;
+}
+
 select,
 .result-input {
   width: 100%;
@@ -328,7 +339,7 @@ select:focus,
 
 .generate-button:hover,
 .copy-button:hover,
-.prompt-toggle:hover,
+.prompt-switch:hover,
 .lock-button:hover {
   transform: translateY(-1px);
 }
@@ -400,24 +411,23 @@ select:focus,
   gap: 10px;
 }
 
-.prompt-toggle-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.prompt-toggle {
+.prompt-switch {
   border: 1px solid rgba(162, 193, 255, 0.16);
   background: rgba(255, 255, 255, 0.04);
   color: var(--text-soft);
   border-radius: 999px;
-  min-height: 36px;
-  padding: 8px 14px;
+  min-height: 34px;
+  padding: 6px 12px;
   cursor: pointer;
   transition: border-color 120ms ease, background 120ms ease, transform 120ms ease;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  white-space: nowrap;
 }
 
-.prompt-toggle.is-active {
+.prompt-switch.is-enabled {
   background: linear-gradient(135deg, rgba(83, 217, 255, 0.16), rgba(169, 104, 255, 0.18));
   border-color: rgba(83, 217, 255, 0.34);
   color: #f4fbff;
@@ -485,6 +495,13 @@ select:focus,
   align-items: start;
 }
 
+.card-heading-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: end;
+}
+
 .result-card p,
 .palette-card h3,
 .favorites-panel h3 {
@@ -516,6 +533,18 @@ select:focus,
   background: rgba(169, 104, 255, 0.18);
   border-color: rgba(169, 104, 255, 0.34);
   color: #f1deff;
+}
+
+@media (max-width: 720px) {
+  .label-row,
+  .card-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .card-heading-actions {
+    justify-content: start;
+  }
 }
 
 @media (max-width: 640px) {

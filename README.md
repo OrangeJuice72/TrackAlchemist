@@ -1,20 +1,17 @@
-# Song Instrumental Generator (React Starter)
+# Song Instrumental Generator
 
-A small React + Vite starter for generating instrumental ideas from a selected main genre.
+A React + Vite app for generating instrumental concepts, editing the generated fields, and exporting tailored prompts.
 
 ## Included
 
 - Main genre dropdown
+- Secondary genre blend with adjustable weight
 - Generate Idea button
-- Randomized output for:
-  - Flavor Genre
-  - BPM
-  - Scale
-  - Instrumentation Palette
-  - Signature Sound
-  - Energy Feel
-- Expandable data structure in `src/data.js`
-- Generator logic in `src/generator.js`
+- Lock individual generated fields before rerolling
+- Prompt template selection
+- Per-field prompt on/off switches directly on the related controls
+- Favorite preset saving
+- JSON and plain prompt copy actions
 
 ## Run locally
 
@@ -30,10 +27,9 @@ npm run dev
 - `src/App.jsx` — UI layout and rendering
 - `src/styles.css` — styling
 
-## Good next upgrades
+## Project notes
 
-- Lock individual fields and reroll the others
-- Add weighted randomness
-- Save favorite ideas
-- Add copy/export preset button
-- Split genre data into multiple files if it gets very large
+- `src/data.js` contains the genre source pools.
+- `src/generator.js` handles seeded generation and weighted genre blending.
+- `src/App.jsx` renders the UI and prompt composition logic.
+- `src/styles.css` contains the app styling.

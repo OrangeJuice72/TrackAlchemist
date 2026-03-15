@@ -497,7 +497,13 @@ function App() {
         <section className="panel controls-panel">
           <div className="controls-grid">
             <div className="field-group">
-              <label htmlFor="genre-select">Primary Main Genre</label>
+              <div className="label-row">
+                <label htmlFor="genre-select">Primary Main Genre</label>
+                <PromptSwitch
+                  isEnabled={promptInclusions.mainGenre}
+                  onClick={() => togglePromptInclusion('mainGenre')}
+                />
+              </div>
               <select id="genre-select" value={selectedGenre} onChange={handlePrimaryGenreChange}>
                 {genreEntries.map(([key, value]) => (
                   <option key={key} value={key}>
@@ -526,7 +532,13 @@ function App() {
             </div>
 
             <div className="field-group field-group-wide">
-              <label htmlFor="premise-input">Premise</label>
+              <div className="label-row">
+                <label htmlFor="premise-input">Premise</label>
+                <PromptSwitch
+                  isEnabled={promptInclusions.premise}
+                  onClick={() => togglePromptInclusion('premise')}
+                />
+              </div>
               <textarea
                 id="premise-input"
                 className="result-input result-textarea"
@@ -537,7 +549,13 @@ function App() {
             </div>
 
             <div className="field-group field-group-wide">
-              <label htmlFor="reference-artists-input">Reference Artists / Producers</label>
+              <div className="label-row">
+                <label htmlFor="reference-artists-input">Reference Artists / Producers</label>
+                <PromptSwitch
+                  isEnabled={promptInclusions.referenceArtists}
+                  onClick={() => togglePromptInclusion('referenceArtists')}
+                />
+              </div>
               <input
                 id="reference-artists-input"
                 className="result-input"
@@ -603,7 +621,13 @@ function App() {
 
           <div className="meta-grid">
             <div className="field-group">
-              <label htmlFor="seed-input">Generation Seed</label>
+              <div className="label-row">
+                <label htmlFor="seed-input">Generation Seed</label>
+                <PromptSwitch
+                  isEnabled={promptInclusions.seed}
+                  onClick={() => togglePromptInclusion('seed')}
+                />
+              </div>
               <div className="seed-field">
                 <input
                   id="seed-input"
@@ -643,61 +667,50 @@ function App() {
             <p>{plainPrompt}</p>
           </div>
 
-          <div className="palette-card">
-            <div className="card-heading">
-              <div>
-                <p className="result-label">Prompt Filters</p>
-                <h3>Included in Prompt</h3>
-              </div>
-            </div>
-            <div className="prompt-toggle-grid">
-              {promptFieldDefinitions.map((field) => (
-                <button
-                  key={field.key}
-                  type="button"
-                  className={`prompt-toggle${promptInclusions[field.key] ? ' is-active' : ''}`}
-                  onClick={() => togglePromptInclusion(field.key)}
-                >
-                  {field.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
           <div className="result-grid">
             <EditableResultCard
               title="Flavor Genre"
               value={result.flavorGenre}
               isLocked={lockedFields.flavorGenre}
+              isPromptEnabled={promptInclusions.flavorGenre}
               onToggleLock={() => toggleLock('flavorGenre')}
+              onTogglePrompt={() => togglePromptInclusion('flavorGenre')}
               onChange={(value) => updateResultField('flavorGenre', value)}
             />
             <EditableResultCard
               title="Scale"
               value={result.scale}
               isLocked={lockedFields.scale}
+              isPromptEnabled={promptInclusions.scale}
               onToggleLock={() => toggleLock('scale')}
+              onTogglePrompt={() => togglePromptInclusion('scale')}
               onChange={(value) => updateResultField('scale', value)}
             />
             <EditableResultCard
               title="Key Center"
               value={result.keyCenter}
               isLocked={lockedFields.keyCenter}
+              isPromptEnabled={promptInclusions.keyCenter}
               onToggleLock={() => toggleLock('keyCenter')}
+              onTogglePrompt={() => togglePromptInclusion('keyCenter')}
               onChange={(value) => updateResultField('keyCenter', value)}
             />
             <EditableResultCard
               title="Chord Progression"
               value={result.chordProgression}
               isLocked={lockedFields.chordProgression}
+              isPromptEnabled={promptInclusions.chordProgression}
               onToggleLock={() => toggleLock('chordProgression')}
+              onTogglePrompt={() => togglePromptInclusion('chordProgression')}
               onChange={(value) => updateResultField('chordProgression', value)}
             />
             <EditableResultCard
               title="Signature Sound"
               value={result.signatureSound}
               isLocked={lockedFields.signatureSound}
+              isPromptEnabled={promptInclusions.signatureSound}
               onToggleLock={() => toggleLock('signatureSound')}
+              onTogglePrompt={() => togglePromptInclusion('signatureSound')}
               onChange={(value) => updateResultField('signatureSound', value)}
               multiline
             />
@@ -705,14 +718,18 @@ function App() {
               title="Era"
               value={result.era}
               isLocked={lockedFields.era}
+              isPromptEnabled={promptInclusions.era}
               onToggleLock={() => toggleLock('era')}
+              onTogglePrompt={() => togglePromptInclusion('era')}
               onChange={(value) => updateResultField('era', value)}
             />
             <EditableResultCard
               title="Mood Tags"
               value={result.moodTags.join(', ')}
               isLocked={lockedFields.moodTags}
+              isPromptEnabled={promptInclusions.moodTags}
               onToggleLock={() => toggleLock('moodTags')}
+              onTogglePrompt={() => togglePromptInclusion('moodTags')}
               onChange={(value) =>
                 updateResultField(
                   'moodTags',
@@ -728,14 +745,18 @@ function App() {
               title="Energy Feel"
               value={result.energyFeel}
               isLocked={lockedFields.energyFeel}
+              isPromptEnabled={promptInclusions.energyFeel}
               onToggleLock={() => toggleLock('energyFeel')}
+              onTogglePrompt={() => togglePromptInclusion('energyFeel')}
               onChange={(value) => updateResultField('energyFeel', value)}
             />
             <EditableResultCard
               title="Song Structure"
               value={result.songStructure}
               isLocked={lockedFields.songStructure}
+              isPromptEnabled={promptInclusions.songStructure}
               onToggleLock={() => toggleLock('songStructure')}
+              onTogglePrompt={() => togglePromptInclusion('songStructure')}
               onChange={(value) => updateResultField('songStructure', value)}
               multiline
             />
@@ -743,7 +764,9 @@ function App() {
               title="BPM"
               value={String(result.bpm)}
               isLocked={lockedFields.bpm}
+              isPromptEnabled={promptInclusions.bpm}
               onToggleLock={() => toggleLock('bpm')}
+              onTogglePrompt={() => togglePromptInclusion('bpm')}
               onChange={(value) => updateResultField('bpm', value.replace(/[^\d]/g, ''))}
               inputMode="numeric"
             />
@@ -752,10 +775,16 @@ function App() {
           <div className="palette-card">
             <div className="card-heading">
               <h3>Instrumentation Palette</h3>
-              <LockButton
-                isLocked={lockedFields.instrumentationPalette}
-                onClick={() => toggleLock('instrumentationPalette')}
-              />
+              <div className="card-heading-actions">
+                <PromptSwitch
+                  isEnabled={promptInclusions.instrumentationPalette}
+                  onClick={() => togglePromptInclusion('instrumentationPalette')}
+                />
+                <LockButton
+                  isLocked={lockedFields.instrumentationPalette}
+                  onClick={() => toggleLock('instrumentationPalette')}
+                />
+              </div>
             </div>
             <textarea
               className="result-input result-textarea"
@@ -775,10 +804,16 @@ function App() {
           <div className="palette-card">
             <div className="card-heading">
               <h3>Section Arrangement</h3>
-              <LockButton
-                isLocked={lockedFields.arrangement}
-                onClick={() => toggleLock('arrangement')}
-              />
+              <div className="card-heading-actions">
+                <PromptSwitch
+                  isEnabled={promptInclusions.arrangement}
+                  onClick={() => togglePromptInclusion('arrangement')}
+                />
+                <LockButton
+                  isLocked={lockedFields.arrangement}
+                  onClick={() => toggleLock('arrangement')}
+                />
+              </div>
             </div>
             <div className="arrangement-list">
               {result.arrangement.map((item, index) => (
@@ -804,10 +839,16 @@ function App() {
           <div className="palette-card">
             <div className="card-heading">
               <h3>Intensity Map</h3>
-              <LockButton
-                isLocked={lockedFields.intensityMap}
-                onClick={() => toggleLock('intensityMap')}
-              />
+              <div className="card-heading-actions">
+                <PromptSwitch
+                  isEnabled={promptInclusions.intensityMap}
+                  onClick={() => togglePromptInclusion('intensityMap')}
+                />
+                <LockButton
+                  isLocked={lockedFields.intensityMap}
+                  onClick={() => toggleLock('intensityMap')}
+                />
+              </div>
             </div>
             <div className="arrangement-list">
               {result.intensityMap.map((item, index) => (
@@ -887,7 +928,9 @@ function EditableResultCard({
   title,
   value,
   isLocked,
+  isPromptEnabled,
   onToggleLock,
+  onTogglePrompt,
   onChange,
   multiline = false,
   inputMode
@@ -896,7 +939,10 @@ function EditableResultCard({
     <article className="result-card">
       <div className="card-heading">
         <p>{title}</p>
-        <LockButton isLocked={isLocked} onClick={onToggleLock} />
+        <div className="card-heading-actions">
+          <PromptSwitch isEnabled={isPromptEnabled} onClick={onTogglePrompt} />
+          <LockButton isLocked={isLocked} onClick={onToggleLock} />
+        </div>
       </div>
       {multiline ? (
         <textarea
@@ -913,6 +959,18 @@ function EditableResultCard({
         />
       )}
     </article>
+  );
+}
+
+function PromptSwitch({ isEnabled, onClick }) {
+  return (
+    <button
+      type="button"
+      className={`prompt-switch${isEnabled ? ' is-enabled' : ''}`}
+      onClick={onClick}
+    >
+      {isEnabled ? 'Prompt On' : 'Prompt Off'}
+    </button>
   );
 }
 
