@@ -337,19 +337,12 @@ function App() {
       <div className="container">
         <header className="hero-card">
           <div className="hero-topline">
-            <p className="eyebrow">Track concept generator</p>
-            <span className="hero-pill">Hybrid-ready</span>
+            <p className="eyebrow">Track Generator</p>
           </div>
           <h1>TrackAlchemist</h1>
           <p className="subtitle">
-            Blend genres by ratio, reuse a seed for repeatable concepts, shape harmony and
-            intensity, and export prompts tuned for your target platform.
+            Build song-ready concepts fast.
           </p>
-          <div className="hero-stats">
-            <HeroStat label="Main Genres" value="25" />
-            <HeroStat label="Flavor Genres" value="100+" />
-            <HeroStat label="Prompt Modes" value="5" />
-          </div>
         </header>
 
         <section className="panel controls-panel">
@@ -380,32 +373,6 @@ function App() {
                       {value.label}
                     </option>
                   ))}
-              </select>
-            </div>
-
-            <div className="field-group">
-              <label htmlFor="seed-input">Generation Seed</label>
-              <input
-                id="seed-input"
-                className="result-input"
-                value={seedInput}
-                onChange={handleSeedChange}
-                placeholder="Type a repeatable seed"
-              />
-            </div>
-
-            <div className="field-group">
-              <label htmlFor="prompt-template">Prompt Template</label>
-              <select
-                id="prompt-template"
-                value={promptTemplate}
-                onChange={(event) => setPromptTemplate(event.target.value)}
-              >
-                {promptTemplates.map((template) => (
-                  <option key={template.key} value={template.key}>
-                    {template.label}
-                  </option>
-                ))}
               </select>
             </div>
 
@@ -484,6 +451,34 @@ function App() {
               {copyState === 'failed' && 'Clipboard copy failed. Try again in a secure browser tab.'}
             </p>
           ) : null}
+
+          <div className="meta-grid">
+            <div className="field-group">
+              <label htmlFor="seed-input">Generation Seed</label>
+              <input
+                id="seed-input"
+                className="result-input"
+                value={seedInput}
+                onChange={handleSeedChange}
+                placeholder="Type a repeatable seed"
+              />
+            </div>
+
+            <div className="field-group">
+              <label htmlFor="prompt-template">Prompt Template</label>
+              <select
+                id="prompt-template"
+                value={promptTemplate}
+                onChange={(event) => setPromptTemplate(event.target.value)}
+              >
+                {promptTemplates.map((template) => (
+                  <option key={template.key} value={template.key}>
+                    {template.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
 
           <div className="prompt-preview">
             <p className="result-label">Prompt Snapshot</p>
@@ -705,15 +700,6 @@ function App() {
           )}
         </section>
       </div>
-    </div>
-  );
-}
-
-function HeroStat({ label, value }) {
-  return (
-    <div className="hero-stat">
-      <strong>{value}</strong>
-      <span>{label}</span>
     </div>
   );
 }
