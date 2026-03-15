@@ -140,6 +140,14 @@ select {
   align-items: center;
 }
 
+.result-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: end;
+}
+
 .result-label {
   margin-bottom: 6px;
   color: #c9bbef;
@@ -154,6 +162,26 @@ select {
   background: rgba(187, 134, 255, 0.18);
   border: 1px solid rgba(187, 134, 255, 0.26);
   font-weight: 700;
+}
+
+.copy-button {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  padding: 12px 18px;
+  color: white;
+  background: rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.copy-status {
+  margin: -6px 0 0;
+  color: #c8ffcf;
+  font-size: 0.92rem;
+}
+
+.copy-status.is-error {
+  color: #ffb5c7;
 }
 
 .result-grid {
@@ -234,5 +262,9 @@ select {
   .result-header {
     flex-direction: column;
     align-items: start;
+  }
+
+  .result-actions {
+    justify-content: start;
   }
 }

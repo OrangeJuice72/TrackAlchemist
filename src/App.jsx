@@ -25,6 +25,7 @@ function App() {
   const [secondaryGenre, setSecondaryGenre] = useState('');
   const [lockedFields, setLockedFields] = useState(createEmptyLocks);
   const [result, setResult] = useState(() => generateIdea(genreEntries[0][0], ''));
+  const [copyState, setCopyState] = useState('idle');
 
   const genreLabel = useMemo(() => {
     const primaryLabel = GENRE_DATA[selectedGenre].label;
@@ -62,6 +63,47 @@ function App() {
     const nextSecondaryGenre = event.target.value;
     setSecondaryGenre(nextSecondaryGenre);
     setResult(generateIdea(selectedGenre, nextSecondaryGenre));
+  };
+
+  const handleCopyPrompt = async () => {
+    const payload = {
+      promptType: 'instrumental-track-concept',
+      primaryGenre: {
+        key: selectedGenre,
+        label: GENRE_DATA[selectedGenre].label
+      },
+      secondaryGenre: secondaryGenre
+        ? {
+            key: secondaryGenre,
+            label: GENRE_DATA[secondaryGenre].label
+          }
+        : null,
+      lockedFields,
+      generatedConcept: {
+        mainGenre: result.mainGenre,
+        flavorGenre: result.flavorGenre,
+        bpm: result.bpm,
+        scale: result.scale,
+        instrumentationPalette: result.instrumentationPalette,
+        signatureSound: result.signatureSound,
+        energyFeel: result.energyFeel,
+        songStructure: result.songStructure
+      },
+      prompt:
+        `Create an original instrumental track concept using the following parameters: ` +
+        `${result.mainGenre} main genre blend, ${result.flavorGenre} flavor, ${result.bpm} BPM, ` +
+        `${result.scale} scale, instrumentation palette of ${result.instrumentationPalette.join(', ')}, ` +
+        `signature sound "${result.signatureSound}", energy feel "${result.energyFeel}", and song structure ` +
+        `"${result.songStructure}".`
+    };
+
+    try {
+      await navigator.clipboard.writeText(JSON.stringify(payload, null, 2));
+      setCopyState('copied');
+      window.setTimeout(() => setCopyState('idle'), 2000);
+    } catch {
+      setCopyState('failed');
+    }
   };
 
   return (
@@ -119,8 +161,21 @@ function App() {
               <p className="result-label">Current concept</p>
               <h2>{genreLabel}</h2>
             </div>
-            <span className="badge">{result.bpm} BPM</span>
+            <div className="result-actions">
+              <span className="badge">{result.bpm} BPM</span>
+              <button type="button" className="copy-button" onClick={handleCopyPrompt}>
+                Copy JSON Prompt
+              </button>
+            </div>
           </div>
+
+          {copyState !== 'idle' ? (
+            <p className={`copy-status${copyState === 'failed' ? ' is-error' : ''}`}>
+              {copyState === 'copied'
+                ? 'JSON prompt copied to clipboard.'
+                : 'Clipboard copy failed. Try again in a secure browser tab.'}
+            </p>
+          ) : null}
 
           <div className="result-grid">
             <LockableResultCard
