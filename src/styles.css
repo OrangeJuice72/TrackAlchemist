@@ -401,7 +401,8 @@ select:focus,
 }
 
 .arrangement-list,
-.favorites-list {
+.favorites-list,
+.custom-pools-grid {
   display: grid;
   gap: 14px;
 }

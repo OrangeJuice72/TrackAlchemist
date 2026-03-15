@@ -70,8 +70,8 @@ function buildArrangement(songStructure) {
   }));
 }
 
-function pickMoodTags() {
-  const pool = [...MOOD_TAGS];
+function pickMoodTags(source = MOOD_TAGS) {
+  const pool = [...source];
   const count = randomInt(2, 4);
   const tags = [];
 
@@ -89,18 +89,34 @@ export function generateIdea(
   secondaryGenreKey,
   locks = {},
   previousResult = null,
-  primaryWeight = 50
+  primaryWeight = 50,
+  customPools = {}
 ) {
   const genre = combineGenres(primaryGenreKey, secondaryGenreKey, primaryWeight);
   const nextRange = pick(genre.bpmRanges);
   const nextPalette = pick(genre.instrumentationPalettes);
+  const flavorGenres =
+    customPools.flavorGenres?.length > 0
+      ? [...genre.flavorGenres, ...customPools.flavorGenres]
+      : genre.flavorGenres;
+  const signatureSounds =
+    customPools.signatureSounds?.length > 0
+      ? [...genre.signatureSounds, ...customPools.signatureSounds]
+      : genre.signatureSounds;
+  const eras = customPools.eras?.length > 0 ? [...ERAS, ...customPools.eras] : ERAS;
+  const moodTagsSource =
+    customPools.moodTags?.length > 0 ? [...MOOD_TAGS, ...customPools.moodTags] : MOOD_TAGS;
+  const songStructures =
+    customPools.songStructures?.length > 0
+      ? [...SONG_STRUCTURES, ...customPools.songStructures]
+      : SONG_STRUCTURES;
   const nextSongStructure =
-    locks.songStructure && previousResult ? previousResult.songStructure : pick(SONG_STRUCTURES);
+    locks.songStructure && previousResult ? previousResult.songStructure : pick(songStructures);
 
   return {
     mainGenre: genre.label,
     flavorGenre:
-      locks.flavorGenre && previousResult ? previousResult.flavorGenre : pick(genre.flavorGenres),
+      locks.flavorGenre && previousResult ? previousResult.flavorGenre : pick(flavorGenres),
     bpm: locks.bpm && previousResult ? previousResult.bpm : randomInt(nextRange[0], nextRange[1]),
     scale: locks.scale && previousResult ? previousResult.scale : pick(genre.scales),
     instrumentationPalette:
@@ -110,11 +126,12 @@ export function generateIdea(
     signatureSound:
       locks.signatureSound && previousResult
         ? previousResult.signatureSound
-        : pick(genre.signatureSounds),
+        : pick(signatureSounds),
     energyFeel:
       locks.energyFeel && previousResult ? previousResult.energyFeel : pick(genre.energyFeels),
-    era: locks.era && previousResult ? previousResult.era : pick(ERAS),
-    moodTags: locks.moodTags && previousResult ? previousResult.moodTags : pickMoodTags(),
+    era: locks.era && previousResult ? previousResult.era : pick(eras),
+    moodTags:
+      locks.moodTags && previousResult ? previousResult.moodTags : pickMoodTags(moodTagsSource),
     songStructure: nextSongStructure,
     arrangement:
       locks.arrangement && previousResult

@@ -4,6 +4,14 @@ import { generateIdea } from './generator.js';
 
 const genreEntries = Object.entries(GENRE_DATA);
 const favoritesStorageKey = 'trackalchemist-favorites';
+const customPoolsStorageKey = 'trackalchemist-custom-pools';
+const customPoolFields = [
+  { key: 'flavorGenres', label: 'Custom Flavor Genres' },
+  { key: 'signatureSounds', label: 'Custom Signature Sounds' },
+  { key: 'moodTags', label: 'Custom Mood Tags' },
+  { key: 'songStructures', label: 'Custom Song Structures' },
+  { key: 'eras', label: 'Custom Eras' }
+];
 const lockableFields = [
   'flavorGenre',
   'bpm',
@@ -24,6 +32,13 @@ function createEmptyLocks() {
   }, {});
 }
 
+function createEmptyCustomPools() {
+  return customPoolFields.reduce((pools, field) => {
+    pools[field.key] = [];
+    return pools;
+  }, {});
+}
+
 function readFavorites() {
   if (typeof window === 'undefined') {
     return [];
@@ -36,8 +51,27 @@ function readFavorites() {
   }
 }
 
+function readCustomPools() {
+  if (typeof window === 'undefined') {
+    return createEmptyCustomPools();
+  }
+
+  try {
+    return {
+      ...createEmptyCustomPools(),
+      ...JSON.parse(window.localStorage.getItem(customPoolsStorageKey) ?? '{}')
+    };
+  } catch {
+    return createEmptyCustomPools();
+  }
+}
+
 function persistFavorites(favorites) {
   window.localStorage.setItem(favoritesStorageKey, JSON.stringify(favorites));
+}
+
+function persistCustomPools(customPools) {
+  window.localStorage.setItem(customPoolsStorageKey, JSON.stringify(customPools));
 }
 
 function buildPlainPrompt({ premise, referenceArtists, result }) {
@@ -66,7 +100,10 @@ function App() {
   const [secondaryGenre, setSecondaryGenre] = useState('');
   const [blendWeight, setBlendWeight] = useState(65);
   const [lockedFields, setLockedFields] = useState(createEmptyLocks);
-  const [result, setResult] = useState(() => generateIdea(genreEntries[0][0], '', {}, null, 65));
+  const [customPools, setCustomPools] = useState(readCustomPools);
+  const [result, setResult] = useState(() =>
+    generateIdea(genreEntries[0][0], '', {}, null, 65, readCustomPools())
+  );
   const [premise, setPremise] = useState('');
   const [referenceArtists, setReferenceArtists] = useState('');
   const [copyState, setCopyState] = useState('idle');
@@ -83,10 +120,18 @@ function App() {
 
   const plainPrompt = buildPlainPrompt({ premise, referenceArtists, result });
 
-  const handleGenerate = () => {
-    setResult((previousResult) =>
-      generateIdea(selectedGenre, secondaryGenre, lockedFields, previousResult, blendWeight)
+  const regenerate = (nextLocks = lockedFields, previousResult = null) =>
+    generateIdea(
+      selectedGenre,
+      secondaryGenre,
+      nextLocks,
+      previousResult,
+      blendWeight,
+      customPools
     );
+
+  const handleGenerate = () => {
+    setResult((previousResult) => regenerate(lockedFields, previousResult));
   };
 
   const updateResultField = (field, value) => {
@@ -108,19 +153,33 @@ function App() {
     const nextSecondaryGenre = nextPrimaryGenre === secondaryGenre ? '' : secondaryGenre;
     setSelectedGenre(nextPrimaryGenre);
     setSecondaryGenre(nextSecondaryGenre);
-    setResult(generateIdea(nextPrimaryGenre, nextSecondaryGenre, {}, null, blendWeight));
+    setResult(generateIdea(nextPrimaryGenre, nextSecondaryGenre, {}, null, blendWeight, customPools));
   };
 
   const handleSecondaryGenreChange = (event) => {
     const nextSecondaryGenre = event.target.value;
     setSecondaryGenre(nextSecondaryGenre);
-    setResult(generateIdea(selectedGenre, nextSecondaryGenre, {}, null, blendWeight));
+    setResult(generateIdea(selectedGenre, nextSecondaryGenre, {}, null, blendWeight, customPools));
   };
 
   const handleWeightChange = (event) => {
     const nextWeight = Number(event.target.value);
     setBlendWeight(nextWeight);
-    setResult(generateIdea(selectedGenre, secondaryGenre, {}, null, nextWeight));
+    setResult(generateIdea(selectedGenre, secondaryGenre, {}, null, nextWeight, customPools));
+  };
+
+  const handleCustomPoolChange = (field, value) => {
+    const nextPools = {
+      ...customPools,
+      [field]: value
+        .split('\n')
+        .map((item) => item.trim())
+        .filter(Boolean)
+    };
+
+    setCustomPools(nextPools);
+    persistCustomPools(nextPools);
+    setResult(generateIdea(selectedGenre, secondaryGenre, {}, null, blendWeight, nextPools));
   };
 
   const handleCopyJsonPrompt = async () => {
@@ -140,6 +199,7 @@ function App() {
       lockedFields,
       premise,
       referenceArtists,
+      customPools,
       generatedConcept: {
         mainGenre: result.mainGenre,
         flavorGenre: result.flavorGenre,
@@ -186,6 +246,7 @@ function App() {
         premise,
         referenceArtists,
         lockedFields,
+        customPools,
         result
       },
       ...favorites
@@ -202,6 +263,8 @@ function App() {
     setPremise(favorite.premise);
     setReferenceArtists(favorite.referenceArtists);
     setLockedFields(favorite.lockedFields);
+    setCustomPools(favorite.customPools ?? createEmptyCustomPools());
+    persistCustomPools(favorite.customPools ?? createEmptyCustomPools());
     setResult(favorite.result);
   };
 
@@ -224,13 +287,13 @@ function App() {
           </div>
           <h1>TrackAlchemist</h1>
           <p className="subtitle">
-            Blend genres by ratio, shape the concept with moods and section notes, and save the
-            strongest presets for later.
+            Blend genres by ratio, shape the concept with moods and section notes, save presets,
+            and inject your own custom pools into the generator.
           </p>
           <div className="hero-stats">
             <HeroStat label="Main Genres" value="25" />
-            <HeroStat label="Flavor Genres" value="100" />
-            <HeroStat label="Song Structures" value="36" />
+            <HeroStat label="Flavor Genres" value="100+" />
+            <HeroStat label="Song Structures" value="36+" />
           </div>
         </header>
 
@@ -506,6 +569,28 @@ function App() {
               ))}
             </div>
           )}
+        </section>
+
+        <section className="panel favorites-panel">
+          <div className="card-heading">
+            <div>
+              <p className="result-label">Custom Pools</p>
+              <h3>Generator Add-Ons</h3>
+            </div>
+          </div>
+          <div className="custom-pools-grid">
+            {customPoolFields.map((field) => (
+              <div key={field.key} className="arrangement-item">
+                <strong>{field.label}</strong>
+                <textarea
+                  className="result-input result-textarea"
+                  value={customPools[field.key].join('\n')}
+                  onChange={(event) => handleCustomPoolChange(field.key, event.target.value)}
+                  placeholder="One item per line"
+                />
+              </div>
+            ))}
+          </div>
         </section>
       </div>
     </div>
