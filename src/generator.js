@@ -1,18 +1,39 @@
-import {
-  ARRANGEMENT_NOTES,
-  ERAS,
-  GENRE_DATA,
-  MOOD_TAGS,
-  SONG_STRUCTURES
-} from './data.js';
+import { ERAS, GENRE_DATA, MOOD_TAGS, SONG_STRUCTURES } from './data.js';
 
-const ROOT_NOTES = ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
-const CHORD_PROGRESSION_POOLS = {
-  major: ['I - V - vi - IV', 'I - IV - vi - V', 'I - vi - IV - V', 'IV - I - V - vi'],
-  minor: ['i - VI - III - VII', 'i - iv - VI - V', 'i - VII - VI - VII', 'i - v - VI - iv'],
-  modal: ['i - II - VII - i', 'I - II - v - I', 'i - bII - i - VII', 'I - VII - IV - I'],
-  pentatonic: ['I - bVII - IV - I', 'i - bVI - bVII - i', 'I - IV - I - V', 'i - iv - i - bVII']
-};
+const SIGNATURE_ACTIONS = [
+  'Build around',
+  'Lean on',
+  'Feature',
+  'Center the track on',
+  'Push forward',
+  'Anchor the record with'
+];
+
+const SIGNATURE_FINISHES = [
+  'with sharp transitions',
+  'with cinematic spacing',
+  'with a polished stereo image',
+  'with rough edges left in',
+  'with subtle ear candy in the gaps',
+  'with movement between sections',
+  'with contrast between sparse and full moments',
+  'with details that keep evolving'
+];
+
+const TEXTURE_MODIFIERS = [
+  'gritty',
+  'glossy',
+  'dusty',
+  'wide',
+  'saturated',
+  'minimal',
+  'expansive',
+  'forward',
+  'punchy',
+  'immersive'
+];
+
+const FLAVOR_JOINERS = ['leaning', 'with touches of', 'cut with', 'pushed toward'];
 
 function xmur3(seed) {
   let hash = 1779033703 ^ seed.length;
@@ -51,6 +72,10 @@ function randomInt(min, max, random) {
   return Math.floor(random() * (max - min + 1)) + min;
 }
 
+function unique(items) {
+  return [...new Set(items)];
+}
+
 function uniqueByValue(items) {
   return [...new Set(items.map((item) => JSON.stringify(item)))].map((item) => JSON.parse(item));
 }
@@ -69,6 +94,31 @@ function mergeWeighted(primaryItems, secondaryItems = [], primaryWeight = 50) {
   }
 
   return weighted.length > 0 ? weighted : primaryItems;
+}
+
+function pickUnique(pool, count, random, fallback = []) {
+  const source = [...pool];
+  const picked = [];
+
+  while (picked.length < count && source.length > 0) {
+    const value = pick(source, random);
+    picked.push(value);
+    source.splice(source.indexOf(value), 1);
+  }
+
+  if (picked.length < count) {
+    for (const item of fallback) {
+      if (picked.length >= count) {
+        break;
+      }
+
+      if (!picked.includes(item)) {
+        picked.push(item);
+      }
+    }
+  }
+
+  return picked;
 }
 
 function combineGenres(primaryGenreKey, secondaryGenreKey, primaryWeight = 50) {
@@ -100,39 +150,64 @@ function combineGenres(primaryGenreKey, secondaryGenreKey, primaryWeight = 50) {
   };
 }
 
-function classifyScale(scale) {
-  const normalized = scale.toLowerCase();
+function buildFlavorGenre(flavorGenres, random) {
+  const primaryFlavor = pick(flavorGenres, random);
 
-  if (normalized.includes('pentatonic') || normalized.includes('blues')) {
-    return 'pentatonic';
+  if (flavorGenres.length < 2 || random() < 0.58) {
+    return primaryFlavor;
   }
 
-  if (
-    normalized.includes('dorian') ||
-    normalized.includes('phrygian') ||
-    normalized.includes('mixolydian') ||
-    normalized.includes('lydian') ||
-    normalized.includes('locrian') ||
-    normalized.includes('whole tone')
-  ) {
-    return 'modal';
-  }
-
-  if (normalized.includes('major')) {
-    return 'major';
-  }
-
-  return 'minor';
+  const secondaryFlavorPool = flavorGenres.filter((item) => item !== primaryFlavor);
+  const secondaryFlavor = pick(secondaryFlavorPool, random);
+  return `${primaryFlavor} ${pick(FLAVOR_JOINERS, random)} ${secondaryFlavor}`;
 }
 
-function buildArrangement(songStructure, random) {
-  return songStructure.split(' - ').map((section) => ({
-    section,
-    note: pick(
-      ARRANGEMENT_NOTES[section] ?? ['Keep this section cohesive with the overall track mood'],
-      random
-    )
-  }));
+function buildInstrumentationPalette(instrumentationPalettes, random) {
+  const basePalette = [...pick(instrumentationPalettes, random)];
+  const allItems = unique(instrumentationPalettes.flat());
+  const swapCount = randomInt(1, Math.min(3, basePalette.length), random);
+
+  for (let index = 0; index < swapCount; index += 1) {
+    const replacementPool = allItems.filter((item) => !basePalette.includes(item));
+
+    if (replacementPool.length === 0) {
+      break;
+    }
+
+    const slot = Math.floor(random() * basePalette.length);
+    basePalette[slot] = pick(replacementPool, random);
+  }
+
+  const extras = allItems.filter((item) => !basePalette.includes(item));
+  const finalPalette = [...basePalette];
+
+  if (extras.length > 0 && random() > 0.45) {
+    finalPalette.push(pick(extras, random));
+  }
+
+  return finalPalette;
+}
+
+function buildSignatureSound(signatureSounds, instrumentationPalette, energyFeels, moodTags, random) {
+  const phrase = pick(signatureSounds, random);
+  const texture = pick(TEXTURE_MODIFIERS, random);
+  const focalElement = pick(instrumentationPalette, random).toLowerCase();
+  const emotionalColor = pick(unique([...energyFeels, ...moodTags]), random).toLowerCase();
+
+  const variants = [
+    `${pick(SIGNATURE_ACTIONS, random)} ${phrase.toLowerCase()} ${pick(SIGNATURE_FINISHES, random)}.`,
+    `${pick(SIGNATURE_ACTIONS, random)} ${texture} ${focalElement} around ${phrase.toLowerCase()}.`,
+    `${pick(SIGNATURE_ACTIONS, random)} ${phrase.toLowerCase()} for a ${emotionalColor} payoff.`,
+    `${pick(SIGNATURE_ACTIONS, random)} ${texture} ${focalElement} and ${phrase.toLowerCase()}.`
+  ];
+
+  return pick(variants, random);
+}
+
+function pickMoodTags(source, energyFeels, random) {
+  const pool = unique([...source, ...energyFeels]);
+  const count = randomInt(3, 5, random);
+  return pickUnique(pool, count, random);
 }
 
 function buildIntensityMap(songStructure, random) {
@@ -150,20 +225,6 @@ function buildIntensityMap(songStructure, random) {
   });
 }
 
-function pickMoodTags(source, random) {
-  const pool = [...source];
-  const count = randomInt(2, 4, random);
-  const tags = [];
-
-  while (tags.length < count && pool.length > 0) {
-    const tag = pick(pool, random);
-    tags.push(tag);
-    pool.splice(pool.indexOf(tag), 1);
-  }
-
-  return tags;
-}
-
 export function generateIdea(
   primaryGenreKey,
   secondaryGenreKey,
@@ -176,7 +237,6 @@ export function generateIdea(
   const random = createRandomizer(seedValue);
   const genre = combineGenres(primaryGenreKey, secondaryGenreKey, primaryWeight);
   const nextRange = pick(genre.bpmRanges, random);
-  const nextPalette = pick(genre.instrumentationPalettes, random);
   const flavorGenres =
     customPools.flavorGenres?.length > 0
       ? [...genre.flavorGenres, ...customPools.flavorGenres]
@@ -195,44 +255,32 @@ export function generateIdea(
   const nextScale = locks.scale && previousResult ? previousResult.scale : pick(genre.scales, random);
   const nextSongStructure =
     locks.songStructure && previousResult ? previousResult.songStructure : pick(songStructures, random);
-  const nextKeyCenter =
-    locks.keyCenter && previousResult
-      ? previousResult.keyCenter
-      : `${pick(ROOT_NOTES, random)} ${nextScale}`;
-  const nextChordProgression =
-    locks.chordProgression && previousResult
-      ? previousResult.chordProgression
-      : pick(CHORD_PROGRESSION_POOLS[classifyScale(nextScale)], random);
+  const nextInstrumentation =
+    locks.instrumentationPalette && previousResult
+      ? previousResult.instrumentationPalette
+      : buildInstrumentationPalette(genre.instrumentationPalettes, random);
+  const nextMoodTags =
+    locks.moodTags && previousResult
+      ? previousResult.moodTags
+      : pickMoodTags(moodTagsSource, genre.energyFeels, random);
 
   return {
     generationSeed: seedValue,
     mainGenre: genre.label,
     flavorGenre:
-      locks.flavorGenre && previousResult ? previousResult.flavorGenre : pick(flavorGenres, random),
+      locks.flavorGenre && previousResult
+        ? previousResult.flavorGenre
+        : buildFlavorGenre(flavorGenres, random),
     bpm: locks.bpm && previousResult ? previousResult.bpm : randomInt(nextRange[0], nextRange[1], random),
     scale: nextScale,
-    keyCenter: nextKeyCenter,
-    chordProgression: nextChordProgression,
-    instrumentationPalette:
-      locks.instrumentationPalette && previousResult
-        ? previousResult.instrumentationPalette
-        : nextPalette,
+    instrumentationPalette: nextInstrumentation,
     signatureSound:
       locks.signatureSound && previousResult
         ? previousResult.signatureSound
-        : pick(signatureSounds, random),
-    energyFeel:
-      locks.energyFeel && previousResult ? previousResult.energyFeel : pick(genre.energyFeels, random),
+        : buildSignatureSound(signatureSounds, nextInstrumentation, genre.energyFeels, nextMoodTags, random),
     era: locks.era && previousResult ? previousResult.era : pick(eras, random),
-    moodTags:
-      locks.moodTags && previousResult
-        ? previousResult.moodTags
-        : pickMoodTags(moodTagsSource, random),
+    moodTags: nextMoodTags,
     songStructure: nextSongStructure,
-    arrangement:
-      locks.arrangement && previousResult
-        ? previousResult.arrangement
-        : buildArrangement(nextSongStructure, random),
     intensityMap:
       locks.intensityMap && previousResult
         ? previousResult.intensityMap

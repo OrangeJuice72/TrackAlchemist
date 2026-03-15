@@ -7,6 +7,7 @@ A React + Vite app for generating instrumental concepts, editing the generated f
 - Main genre dropdown
 - Secondary genre blend with adjustable weight
 - Generate Idea button
+- Combinatorial generation for flavor, instrumentation, mood, and signature direction
 - Lock individual generated fields before rerolling
 - Prompt template selection
 - Per-field prompt on/off switches directly on the related controls
@@ -30,6 +31,6 @@ npm run dev
 ## Project notes
 
 - `src/data.js` contains the genre source pools.
-- `src/generator.js` handles seeded generation and weighted genre blending.
-- `src/App.jsx` renders the UI and prompt composition logic.
+- `src/generator.js` handles seeded generation, weighted genre blending, and the combinatorial remix logic that expands variety without adding more visible sections.
+- `src/App.jsx` renders the reduced-field UI and prompt composition logic.
 - `src/styles.css` contains the app styling.
