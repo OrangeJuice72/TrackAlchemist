@@ -525,3 +525,42 @@ export const GENRE_DATA = {
     energyFeels: ['Gritty', 'Menacing', 'Fast', 'Underground', 'Adrenalized', 'Dirty', 'Dark', 'Reckless']
   }
 };
+
+export const SONG_STRUCTURES = [
+  'Intro - Verse - Chorus - Verse - Chorus - Bridge - Chorus - Outro',
+  'Intro - Hook - Verse - Hook - Verse - Hook - Outro',
+  'Ambient Intro - Drop - Breakdown - Drop - Outro',
+  'Verse - Pre-Chorus - Chorus - Verse - Pre-Chorus - Chorus - Bridge - Chorus',
+  'Intro - Verse - Refrain - Verse - Refrain - Outro',
+  'Intro - Verse - Chorus - Post-Chorus - Verse - Chorus - Post-Chorus - Bridge - Chorus',
+  'Intro - Build - Drop - Verse - Build - Drop - Outro',
+  'Intro - Verse - Chorus - Instrumental Break - Chorus - Outro',
+  'Intro - Verse - Verse - Chorus - Verse - Chorus - Outro',
+  'Cold Open - Verse - Chorus - Verse - Chorus - Bridge - Double Chorus',
+  'Intro - Hook - Verse - Pre-Hook - Hook - Verse - Hook - Outro',
+  'Intro - Theme - Variation - Breakdown - Theme Return - Outro',
+  'Verse - Chorus - Verse - Chorus - Solo - Chorus',
+  'Intro - A Section - B Section - A Section - C Section - A Section',
+  'Drone Intro - Pulse Section - Lift - Impact Section - Fade Outro',
+  'Intro - Verse - Chorus - Verse - Bridge - Final Chorus - Tag',
+  'Intro - Refrain - Verse - Refrain - Breakdown - Refrain - Outro',
+  'Percussion Intro - Verse - Hook - Verse - Hook - Bridge - Hook',
+  'Intro - Verse - Pre-Chorus - Chorus - Drop - Verse - Chorus - Drop',
+  'Sketch Intro - Main Loop - Switch-Up - Main Loop - Outro',
+  'Intro - Verse - Chorus - Verse - Chorus - Breakdown - Chorus - Outro',
+  'Hook Intro - Verse - Hook - Verse - Bridge - Hook - Outro',
+  'Cinematic Intro - Tension Build - Impact - Recovery - Final Impact - Outro',
+  'Intro - Groove A - Groove B - Groove A - Solo Section - Groove A',
+  'Intro - Verse - Pre-Chorus - Chorus - Post-Chorus - Verse - Chorus - Outro',
+  'Intro - Motif - Expansion - Climax - Resolution',
+  'Noise Intro - Beat Entrance - Chorus Lift - Beat Switch - Final Chorus',
+  'Intro - Verse - Hook - Breakdown - Verse - Hook - Outro',
+  'Intro - Chorus - Verse - Chorus - Verse - Bridge - Chorus',
+  'Atmosphere Intro - Verse - Lift - Drop - Breakdown - Final Drop - Outro',
+  'Intro - Verse - Chorus - Rap Break - Chorus - Bridge - Chorus',
+  'Intro - Jam Section - Hook Section - Jam Section - Breakdown - Hook Section',
+  'Intro - Verse - Chorus - Verse - Chorus - Key Change Chorus - Outro',
+  'Intro - Theme A - Theme B - Percussion Break - Theme A - Finale',
+  'Intro - Verse - Build - Chorus - Verse - Build - Chorus - Outro',
+  'Pulse Intro - Verse - Chorus - Half-Time Break - Chorus - Outro'
+];
