@@ -127,11 +127,9 @@ textarea {
 .hero-card {
   position: relative;
   overflow: hidden;
-  padding: 26px 28px;
-  display: grid;
-  grid-template-columns: minmax(0, 1.1fr) minmax(260px, 0.9fr);
-  gap: 24px;
-  align-items: center;
+  padding: 22px 24px;
+  display: flex;
+  justify-content: center;
   background:
     radial-gradient(circle at 18% 22%, rgba(83, 217, 255, 0.16), transparent 22%),
     radial-gradient(circle at 82% 40%, rgba(169, 104, 255, 0.18), transparent 24%),
@@ -150,28 +148,26 @@ textarea {
   pointer-events: none;
 }
 
-.hero-topline {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
 .hero-copy {
   position: relative;
   z-index: 1;
+  display: grid;
+  gap: 4px;
 }
 
 .hero-brand {
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+  gap: 18px;
+  width: 100%;
 }
 
 .hero-logo-shell {
   position: relative;
-  width: min(100%, 96px);
+  flex: 0 0 auto;
+  width: 92px;
+  aspect-ratio: 1;
   padding: 6px;
   border-radius: 28px;
   background:
@@ -182,6 +178,7 @@ textarea {
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.05),
     0 0 40px rgba(128, 94, 255, 0.18);
+  transform: translateZ(0);
 }
 
 .hero-logo-shell::before {
@@ -197,7 +194,6 @@ textarea {
 .hero-logo {
   display: block;
   width: 100%;
-  max-width: 84px;
   margin: 0 auto;
   height: auto;
 }
@@ -206,21 +202,9 @@ textarea {
   margin: 0;
   text-transform: uppercase;
   letter-spacing: 0.16em;
-  font-size: 0.72rem;
+  font-size: 0.74rem;
   font-weight: 600;
   color: var(--cyan);
-}
-
-.hero-chip {
-  padding: 7px 12px;
-  border-radius: 999px;
-  background: linear-gradient(135deg, rgba(83, 217, 255, 0.14), rgba(169, 104, 255, 0.16));
-  border: 1px solid rgba(162, 193, 255, 0.18);
-  color: #eaf7ff;
-  font-size: 0.74rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
 }
 
 h1,
@@ -231,9 +215,9 @@ p {
 }
 
 h1 {
-  margin-bottom: 8px;
-  font-size: clamp(2.35rem, 4vw, 4rem);
-  line-height: 0.94;
+  margin-bottom: 0;
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  line-height: 0.96;
   letter-spacing: -0.05em;
   font-weight: 800;
 }
@@ -242,47 +226,6 @@ h2 {
   font-size: clamp(1.35rem, 2vw, 1.95rem);
   margin-bottom: 0;
   font-weight: 700;
-}
-
-.subtitle {
-  margin-bottom: 0;
-  max-width: 540px;
-  color: var(--text-soft);
-  font-size: 0.98rem;
-}
-
-.hero-mini-stats {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 18px;
-}
-
-.hero-stat-pill {
-  min-width: 116px;
-  padding: 10px 12px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(162, 193, 255, 0.12);
-}
-
-.hero-stat-pill strong,
-.hero-stat-pill span {
-  display: block;
-}
-
-.hero-stat-pill strong {
-  color: #f3fbff;
-  font-size: 0.94rem;
-  font-weight: 800;
-}
-
-.hero-stat-pill span {
-  margin-top: 3px;
-  color: var(--text-soft);
-  font-size: 0.72rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
 }
 
 .controls-panel {
@@ -562,8 +505,29 @@ select:focus,
   }
 
   .hero-card {
-    grid-template-columns: 1fr;
-    gap: 18px;
+    justify-content: center;
+  }
+
+  .hero-brand {
+    gap: 14px;
+  }
+
+  .hero-logo-shell {
+    width: 76px;
+    padding: 5px;
+  }
+
+  .hero-copy {
+    gap: 2px;
+  }
+
+  .eyebrow {
+    font-size: 0.65rem;
+    letter-spacing: 0.14em;
+  }
+
+  h1 {
+    font-size: clamp(1.4rem, 8vw, 2rem);
   }
 
   .controls-grid,
