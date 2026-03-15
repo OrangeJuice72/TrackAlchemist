@@ -575,3 +575,90 @@ export const ERAS = [
   "2020's",
   "Future"
 ];
+
+export const MOOD_TAGS = [
+  'Dark',
+  'Romantic',
+  'Triumphant',
+  'Heartbroken',
+  'Revenge',
+  'Summer',
+  'Winter',
+  'Spiritual',
+  'Luxury',
+  'Street',
+  'Dreamy',
+  'Melancholy',
+  'Euphoric',
+  'Nostalgic',
+  'Cinematic',
+  'Seductive',
+  'Hopeful',
+  'Chaotic',
+  'Lonely',
+  'Victory',
+  'Night Drive',
+  'Sunrise',
+  'Afterparty',
+  'Introspective'
+];
+
+export const ARRANGEMENT_SECTION_TYPES = [
+  'Intro',
+  'Verse',
+  'Pre-Chorus',
+  'Chorus',
+  'Post-Chorus',
+  'Bridge',
+  'Breakdown',
+  'Drop',
+  'Outro'
+];
+
+export const ARRANGEMENT_NOTES = {
+  Intro: [
+    'Start sparse with filtered textures and a teaser melody',
+    'Open with atmosphere only before drums arrive',
+    'Use a stripped-down motif to establish the mood'
+  ],
+  Verse: [
+    'Keep the groove focused and leave space for the topline',
+    'Let the drums and bass carry the momentum with minimal harmony changes',
+    'Introduce the main motif in a restrained way'
+  ],
+  'Pre-Chorus': [
+    'Lift the tension with added percussion and rising harmony',
+    'Thin the drums briefly, then build into the chorus',
+    'Use transitional effects to create anticipation'
+  ],
+  Chorus: [
+    'Open the full arrangement with the widest version of the hook',
+    'Push the low end and let the lead melody feel undeniable',
+    'Make the drums hit harder with layered textures'
+  ],
+  'Post-Chorus': [
+    'Let a catchy instrumental tag answer the chorus',
+    'Use a rhythmic lead or vocal-like chop as the payoff',
+    'Hold the energy but simplify the harmony'
+  ],
+  Bridge: [
+    'Change the chord color to reset the ear',
+    'Pull the drums back and spotlight a new melodic idea',
+    'Use contrast here before the final lift'
+  ],
+  Breakdown: [
+    'Drop to drums, bass, and atmosphere for impact',
+    'Let tension breathe before the next section hits',
+    'Use FX and negative space to reset the arrangement'
+  ],
+  Drop: [
+    'Hit with the biggest drums and lead stack here',
+    'Let the rhythm and bass dominate with minimal distraction',
+    'Make this the peak-energy section'
+  ],
+  Outro: [
+    'Strip layers away until only the core mood remains',
+    'Fade on the hook motif with softened percussion',
+    'Let the final chord or texture trail out naturally'
+  ]
+};

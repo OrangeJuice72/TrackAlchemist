@@ -250,6 +250,15 @@ h2 {
   grid-column: 1 / -1;
 }
 
+.inline-note {
+  display: block;
+  margin-top: 6px;
+  color: var(--gold);
+  font-size: 0.78rem;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
 label {
   font-size: 0.85rem;
   color: var(--text-soft);
@@ -285,6 +294,16 @@ select:focus,
   color: #111318;
   cursor: pointer;
   font-weight: 700;
+}
+
+.button-stack {
+  display: grid;
+  gap: 10px;
+}
+
+.blend-slider {
+  width: 100%;
+  accent-color: var(--gold);
 }
 
 .generate-button {
@@ -371,13 +390,52 @@ select:focus,
 }
 
 .result-card,
-.palette-card {
+.palette-card,
+.favorites-panel {
   border-radius: 22px;
   padding: 18px;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 35%),
     rgba(9, 12, 18, 0.76);
   border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.arrangement-list,
+.favorites-list {
+  display: grid;
+  gap: 14px;
+}
+
+.arrangement-item,
+.favorite-card {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.favorite-card {
+  grid-template-columns: 1fr auto;
+  align-items: center;
+}
+
+.favorite-card strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.favorite-card p,
+.empty-state {
+  margin: 0;
+  color: var(--text-soft);
+}
+
+.favorite-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .card-heading {
@@ -435,6 +493,10 @@ select:focus,
   .hero-stats,
   .controls-grid,
   .result-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .favorite-card {
     grid-template-columns: 1fr;
   }
 

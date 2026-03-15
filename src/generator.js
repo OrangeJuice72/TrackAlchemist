@@ -1,4 +1,10 @@
-import { ERAS, GENRE_DATA, SONG_STRUCTURES } from './data.js';
+import {
+  ARRANGEMENT_NOTES,
+  ERAS,
+  GENRE_DATA,
+  MOOD_TAGS,
+  SONG_STRUCTURES
+} from './data.js';
 
 function pick(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
@@ -12,15 +18,23 @@ function uniqueByValue(items) {
   return [...new Set(items.map((item) => JSON.stringify(item)))].map((item) => JSON.parse(item));
 }
 
-function combineArrays(primary, secondary, key) {
-  if (!secondary) {
-    return primary[key];
+function mergeWeighted(primaryItems, secondaryItems = [], primaryWeight = 50) {
+  const primaryCopies = Math.max(1, Math.round(primaryWeight / 20));
+  const secondaryCopies = Math.max(1, Math.round((100 - primaryWeight) / 20));
+  const weighted = [];
+
+  for (let index = 0; index < primaryCopies; index += 1) {
+    weighted.push(...primaryItems);
   }
 
-  return uniqueByValue([...primary[key], ...secondary[key]]);
+  for (let index = 0; index < secondaryCopies; index += 1) {
+    weighted.push(...secondaryItems);
+  }
+
+  return weighted.length > 0 ? weighted : primaryItems;
 }
 
-function combineGenres(primaryGenreKey, secondaryGenreKey) {
+function combineGenres(primaryGenreKey, secondaryGenreKey, primaryWeight = 50) {
   const primary = GENRE_DATA[primaryGenreKey];
   const secondary = secondaryGenreKey ? GENRE_DATA[secondaryGenreKey] : null;
 
@@ -32,26 +46,61 @@ function combineGenres(primaryGenreKey, secondaryGenreKey) {
     throw new Error(`Unknown genre: ${secondaryGenreKey}`);
   }
 
+  const label = secondary
+    ? `${primary.label} ${primaryWeight}/${100 - primaryWeight} ${secondary.label}`
+    : primary.label;
+
   return {
-    label: secondary ? `${primary.label} x ${secondary.label}` : primary.label,
-    flavorGenres: combineArrays(primary, secondary, 'flavorGenres'),
-    bpmRanges: combineArrays(primary, secondary, 'bpmRanges'),
-    scales: combineArrays(primary, secondary, 'scales'),
-    instrumentationPalettes: combineArrays(primary, secondary, 'instrumentationPalettes'),
-    signatureSounds: combineArrays(primary, secondary, 'signatureSounds'),
-    energyFeels: combineArrays(primary, secondary, 'energyFeels')
+    label,
+    flavorGenres: mergeWeighted(primary.flavorGenres, secondary?.flavorGenres, primaryWeight),
+    bpmRanges: mergeWeighted(primary.bpmRanges, secondary?.bpmRanges, primaryWeight),
+    scales: mergeWeighted(primary.scales, secondary?.scales, primaryWeight),
+    instrumentationPalettes: uniqueByValue(
+      mergeWeighted(primary.instrumentationPalettes, secondary?.instrumentationPalettes, primaryWeight)
+    ),
+    signatureSounds: mergeWeighted(primary.signatureSounds, secondary?.signatureSounds, primaryWeight),
+    energyFeels: mergeWeighted(primary.energyFeels, secondary?.energyFeels, primaryWeight)
   };
 }
 
-export function generateIdea(primaryGenreKey, secondaryGenreKey, locks = {}, previousResult = null) {
-  const genre = combineGenres(primaryGenreKey, secondaryGenreKey);
+function buildArrangement(songStructure) {
+  return songStructure.split(' - ').map((section) => ({
+    section,
+    note: pick(ARRANGEMENT_NOTES[section] ?? ['Keep this section cohesive with the overall track mood'])
+  }));
+}
 
+function pickMoodTags() {
+  const pool = [...MOOD_TAGS];
+  const count = randomInt(2, 4);
+  const tags = [];
+
+  while (tags.length < count && pool.length > 0) {
+    const tag = pick(pool);
+    tags.push(tag);
+    pool.splice(pool.indexOf(tag), 1);
+  }
+
+  return tags;
+}
+
+export function generateIdea(
+  primaryGenreKey,
+  secondaryGenreKey,
+  locks = {},
+  previousResult = null,
+  primaryWeight = 50
+) {
+  const genre = combineGenres(primaryGenreKey, secondaryGenreKey, primaryWeight);
   const nextRange = pick(genre.bpmRanges);
   const nextPalette = pick(genre.instrumentationPalettes);
+  const nextSongStructure =
+    locks.songStructure && previousResult ? previousResult.songStructure : pick(SONG_STRUCTURES);
 
   return {
     mainGenre: genre.label,
-    flavorGenre: locks.flavorGenre && previousResult ? previousResult.flavorGenre : pick(genre.flavorGenres),
+    flavorGenre:
+      locks.flavorGenre && previousResult ? previousResult.flavorGenre : pick(genre.flavorGenres),
     bpm: locks.bpm && previousResult ? previousResult.bpm : randomInt(nextRange[0], nextRange[1]),
     scale: locks.scale && previousResult ? previousResult.scale : pick(genre.scales),
     instrumentationPalette:
@@ -62,9 +111,14 @@ export function generateIdea(primaryGenreKey, secondaryGenreKey, locks = {}, pre
       locks.signatureSound && previousResult
         ? previousResult.signatureSound
         : pick(genre.signatureSounds),
-    energyFeel: locks.energyFeel && previousResult ? previousResult.energyFeel : pick(genre.energyFeels),
+    energyFeel:
+      locks.energyFeel && previousResult ? previousResult.energyFeel : pick(genre.energyFeels),
     era: locks.era && previousResult ? previousResult.era : pick(ERAS),
-    songStructure:
-      locks.songStructure && previousResult ? previousResult.songStructure : pick(SONG_STRUCTURES)
+    moodTags: locks.moodTags && previousResult ? previousResult.moodTags : pickMoodTags(),
+    songStructure: nextSongStructure,
+    arrangement:
+      locks.arrangement && previousResult
+        ? previousResult.arrangement
+        : buildArrangement(nextSongStructure)
   };
 }
