@@ -3,8 +3,16 @@ import { GENRE_DATA } from './data.js';
 import { generateIdea } from './generator.js';
 
 const genreEntries = Object.entries(GENRE_DATA);
+const initialSeed = 'TA-001';
 const favoritesStorageKey = 'trackalchemist-favorites';
 const customPoolsStorageKey = 'trackalchemist-custom-pools';
+const promptTemplates = [
+  { key: 'generic', label: 'Generic Prompt' },
+  { key: 'chatgpt', label: 'ChatGPT Brief' },
+  { key: 'suno', label: 'Suno Prompt' },
+  { key: 'udio', label: 'Udio Prompt' },
+  { key: 'producer', label: 'Producer Brief' }
+];
 const customPoolFields = [
   { key: 'flavorGenres', label: 'Custom Flavor Genres' },
   { key: 'signatureSounds', label: 'Custom Signature Sounds' },
@@ -22,7 +30,10 @@ const lockableFields = [
   'songStructure',
   'instrumentationPalette',
   'moodTags',
-  'arrangement'
+  'arrangement',
+  'chordProgression',
+  'keyCenter',
+  'intensityMap'
 ];
 
 function createEmptyLocks() {
@@ -74,35 +85,87 @@ function persistCustomPools(customPools) {
   window.localStorage.setItem(customPoolsStorageKey, JSON.stringify(customPools));
 }
 
-function buildPlainPrompt({ premise, referenceArtists, result }) {
-  const referenceText = referenceArtists
-    ? `Reference artists or producers: ${referenceArtists}. `
-    : '';
-  const moodText = result.moodTags.length > 0 ? `Mood tags: ${result.moodTags.join(', ')}. ` : '';
-  const arrangementText = result.arrangement
-    .map((item) => `${item.section}: ${item.note}`)
-    .join(' ');
+function buildIntensityText(intensityMap) {
+  return intensityMap.map((item) => `${item.section} ${item.level}/10`).join(', ');
+}
 
-  return (
-    `Create an original track concept. ` +
-    `${premise ? `Premise: "${premise}". ` : ''}` +
-    `${referenceText}` +
-    `${result.mainGenre} genre blend, ${result.flavorGenre} flavor, ${result.bpm} BPM, ` +
-    `${result.scale} scale, ${result.era} aesthetic, instrumentation palette of ${result.instrumentationPalette.join(', ')}, ` +
-    `signature sound "${result.signatureSound}", energy feel "${result.energyFeel}", song structure "${result.songStructure}". ` +
-    `${moodText}` +
-    `Arrangement notes: ${arrangementText}`
-  );
+function buildArrangementText(arrangement) {
+  return arrangement.map((item) => `${item.section}: ${item.note}`).join(' ');
+}
+
+function buildPrompt({ premise, referenceArtists, result, promptTemplate, seedInput }) {
+  const referenceText = referenceArtists ? `Reference artists or producers: ${referenceArtists}. ` : '';
+  const premiseText = premise ? `Premise: "${premise}". ` : '';
+  const moodText = result.moodTags.length > 0 ? `Mood tags: ${result.moodTags.join(', ')}. ` : '';
+  const intensityText = buildIntensityText(result.intensityMap);
+  const arrangementText = buildArrangementText(result.arrangement);
+
+  switch (promptTemplate) {
+    case 'chatgpt':
+      return (
+        `Create a polished song brief and production plan. ` +
+        `${premiseText}${referenceText}` +
+        `Genre blend: ${result.mainGenre}. Flavor genre: ${result.flavorGenre}. ` +
+        `Tempo: ${result.bpm} BPM. Key center: ${result.keyCenter}. Scale: ${result.scale}. ` +
+        `Chord progression: ${result.chordProgression}. Era: ${result.era}. ` +
+        `Mood tags: ${result.moodTags.join(', ')}. Energy feel: ${result.energyFeel}. ` +
+        `Instrumentation palette: ${result.instrumentationPalette.join(', ')}. ` +
+        `Signature sound: ${result.signatureSound}. Song structure: ${result.songStructure}. ` +
+        `Intensity map: ${intensityText}. Arrangement notes: ${arrangementText}. Seed: ${seedInput}.`
+      );
+    case 'suno':
+      return (
+        `${premiseText}` +
+        `${referenceText}` +
+        `${result.mainGenre}, ${result.flavorGenre}, ${result.era}, ${result.energyFeel}, ` +
+        `${result.bpm} BPM, ${result.keyCenter}, chord progression ${result.chordProgression}, ` +
+        `moods ${result.moodTags.join(', ')}, signature sound ${result.signatureSound}, ` +
+        `instrumentation ${result.instrumentationPalette.join(', ')}. ` +
+        `Structure: ${result.songStructure}. Intensity: ${intensityText}.`
+      );
+    case 'udio':
+      return (
+        `Song prompt: ${premiseText}${referenceText}` +
+        `${result.mainGenre} blend with ${result.flavorGenre} flavor, ${result.era} tone, ` +
+        `${result.bpm} BPM in ${result.keyCenter}, progression ${result.chordProgression}. ` +
+        `Use ${result.instrumentationPalette.join(', ')} with ${result.signatureSound}. ` +
+        `Moods: ${result.moodTags.join(', ')}. Energy: ${result.energyFeel}. ` +
+        `Structure ${result.songStructure}. Intensity map ${intensityText}.`
+      );
+    case 'producer':
+      return (
+        `Producer brief. ${premiseText}${referenceText}` +
+        `Blend ${result.mainGenre}; key ${result.keyCenter}; progression ${result.chordProgression}; ` +
+        `tempo ${result.bpm}; era ${result.era}; moods ${result.moodTags.join(', ')}; ` +
+        `energy ${result.energyFeel}; signature ${result.signatureSound}; ` +
+        `palette ${result.instrumentationPalette.join(', ')}; structure ${result.songStructure}; ` +
+        `intensity ${intensityText}; arrangement ${arrangementText}.`
+      );
+    default:
+      return (
+        `Create an original track concept. ` +
+        `${premiseText}${referenceText}` +
+        `${result.mainGenre} genre blend, ${result.flavorGenre} flavor, ${result.bpm} BPM, ` +
+        `${result.keyCenter}, ${result.scale} scale, chord progression ${result.chordProgression}, ` +
+        `${result.era} aesthetic, instrumentation palette of ${result.instrumentationPalette.join(', ')}, ` +
+        `signature sound "${result.signatureSound}", energy feel "${result.energyFeel}", ` +
+        `song structure "${result.songStructure}". ${moodText}` +
+        `Intensity map: ${intensityText}. Arrangement notes: ${arrangementText}`
+      );
+  }
 }
 
 function App() {
+  const initialCustomPools = readCustomPools();
   const [selectedGenre, setSelectedGenre] = useState(genreEntries[0][0]);
   const [secondaryGenre, setSecondaryGenre] = useState('');
   const [blendWeight, setBlendWeight] = useState(65);
+  const [seedInput, setSeedInput] = useState(initialSeed);
+  const [promptTemplate, setPromptTemplate] = useState('generic');
   const [lockedFields, setLockedFields] = useState(createEmptyLocks);
-  const [customPools, setCustomPools] = useState(readCustomPools);
+  const [customPools, setCustomPools] = useState(initialCustomPools);
   const [result, setResult] = useState(() =>
-    generateIdea(genreEntries[0][0], '', {}, null, 65, readCustomPools())
+    generateIdea(genreEntries[0][0], '', {}, null, 65, initialCustomPools, initialSeed)
   );
   const [premise, setPremise] = useState('');
   const [referenceArtists, setReferenceArtists] = useState('');
@@ -118,20 +181,38 @@ function App() {
     ? `${blendWeight}% ${GENRE_DATA[selectedGenre].label} / ${100 - blendWeight}% ${GENRE_DATA[secondaryGenre].label}`
     : `${GENRE_DATA[selectedGenre].label} only`;
 
-  const plainPrompt = buildPlainPrompt({ premise, referenceArtists, result });
+  const plainPrompt = buildPrompt({
+    premise,
+    referenceArtists,
+    result,
+    promptTemplate,
+    seedInput
+  });
 
-  const regenerate = (nextLocks = lockedFields, previousResult = null) =>
-    generateIdea(
-      selectedGenre,
-      secondaryGenre,
+  const generateWithState = ({
+    nextPrimaryGenre = selectedGenre,
+    nextSecondaryGenre = secondaryGenre,
+    nextLocks = lockedFields,
+    previousResult = null,
+    nextWeight = blendWeight,
+    nextCustomPools = customPools,
+    nextSeed = seedInput
+  } = {}) => {
+    const resolvedSeed = nextSeed || `TA-${Date.now()}`;
+    setSeedInput(resolvedSeed);
+    return generateIdea(
+      nextPrimaryGenre,
+      nextSecondaryGenre,
       nextLocks,
       previousResult,
-      blendWeight,
-      customPools
+      nextWeight,
+      nextCustomPools,
+      resolvedSeed
     );
+  };
 
   const handleGenerate = () => {
-    setResult((previousResult) => regenerate(lockedFields, previousResult));
+    setResult((previousResult) => generateWithState({ previousResult }));
   };
 
   const updateResultField = (field, value) => {
@@ -153,19 +234,42 @@ function App() {
     const nextSecondaryGenre = nextPrimaryGenre === secondaryGenre ? '' : secondaryGenre;
     setSelectedGenre(nextPrimaryGenre);
     setSecondaryGenre(nextSecondaryGenre);
-    setResult(generateIdea(nextPrimaryGenre, nextSecondaryGenre, {}, null, blendWeight, customPools));
+    setResult(
+      generateWithState({
+        nextPrimaryGenre,
+        nextSecondaryGenre,
+        nextLocks: {},
+        previousResult: null
+      })
+    );
   };
 
   const handleSecondaryGenreChange = (event) => {
     const nextSecondaryGenre = event.target.value;
     setSecondaryGenre(nextSecondaryGenre);
-    setResult(generateIdea(selectedGenre, nextSecondaryGenre, {}, null, blendWeight, customPools));
+    setResult(
+      generateWithState({
+        nextSecondaryGenre,
+        nextLocks: {},
+        previousResult: null
+      })
+    );
   };
 
   const handleWeightChange = (event) => {
     const nextWeight = Number(event.target.value);
     setBlendWeight(nextWeight);
-    setResult(generateIdea(selectedGenre, secondaryGenre, {}, null, nextWeight, customPools));
+    setResult(
+      generateWithState({
+        nextWeight,
+        nextLocks: {},
+        previousResult: null
+      })
+    );
+  };
+
+  const handleSeedChange = (event) => {
+    setSeedInput(event.target.value);
   };
 
   const handleCustomPoolChange = (field, value) => {
@@ -179,12 +283,20 @@ function App() {
 
     setCustomPools(nextPools);
     persistCustomPools(nextPools);
-    setResult(generateIdea(selectedGenre, secondaryGenre, {}, null, blendWeight, nextPools));
+    setResult(
+      generateWithState({
+        nextCustomPools: nextPools,
+        nextLocks: {},
+        previousResult: null
+      })
+    );
   };
 
   const handleCopyJsonPrompt = async () => {
     const payload = {
       promptType: 'track-concept',
+      promptTemplate,
+      generationSeed: seedInput,
       primaryGenre: {
         key: selectedGenre,
         label: GENRE_DATA[selectedGenre].label
@@ -205,13 +317,16 @@ function App() {
         flavorGenre: result.flavorGenre,
         bpm: result.bpm,
         scale: result.scale,
+        keyCenter: result.keyCenter,
+        chordProgression: result.chordProgression,
         era: result.era,
         moodTags: result.moodTags,
         instrumentationPalette: result.instrumentationPalette,
         signatureSound: result.signatureSound,
         energyFeel: result.energyFeel,
         songStructure: result.songStructure,
-        arrangement: result.arrangement
+        arrangement: result.arrangement,
+        intensityMap: result.intensityMap
       },
       prompt: plainPrompt
     };
@@ -243,6 +358,8 @@ function App() {
         selectedGenre,
         secondaryGenre,
         blendWeight,
+        seedInput,
+        promptTemplate,
         premise,
         referenceArtists,
         lockedFields,
@@ -260,6 +377,8 @@ function App() {
     setSelectedGenre(favorite.selectedGenre);
     setSecondaryGenre(favorite.secondaryGenre);
     setBlendWeight(favorite.blendWeight);
+    setSeedInput(favorite.seedInput ?? initialSeed);
+    setPromptTemplate(favorite.promptTemplate ?? 'generic');
     setPremise(favorite.premise);
     setReferenceArtists(favorite.referenceArtists);
     setLockedFields(favorite.lockedFields);
@@ -287,13 +406,13 @@ function App() {
           </div>
           <h1>TrackAlchemist</h1>
           <p className="subtitle">
-            Blend genres by ratio, shape the concept with moods and section notes, save presets,
-            and inject your own custom pools into the generator.
+            Blend genres by ratio, reuse a seed for repeatable concepts, shape harmony and
+            intensity, and export prompts tuned for your target platform.
           </p>
           <div className="hero-stats">
             <HeroStat label="Main Genres" value="25" />
             <HeroStat label="Flavor Genres" value="100+" />
-            <HeroStat label="Song Structures" value="36+" />
+            <HeroStat label="Prompt Modes" value="5" />
           </div>
         </header>
 
@@ -325,6 +444,32 @@ function App() {
                       {value.label}
                     </option>
                   ))}
+              </select>
+            </div>
+
+            <div className="field-group">
+              <label htmlFor="seed-input">Generation Seed</label>
+              <input
+                id="seed-input"
+                className="result-input"
+                value={seedInput}
+                onChange={handleSeedChange}
+                placeholder="Type a repeatable seed"
+              />
+            </div>
+
+            <div className="field-group">
+              <label htmlFor="prompt-template">Prompt Template</label>
+              <select
+                id="prompt-template"
+                value={promptTemplate}
+                onChange={(event) => setPromptTemplate(event.target.value)}
+              >
+                {promptTemplates.map((template) => (
+                  <option key={template.key} value={template.key}>
+                    {template.label}
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -386,6 +531,7 @@ function App() {
             </div>
             <div className="result-actions">
               <span className="badge">{result.bpm} BPM</span>
+              <span className="badge">Seed {seedInput}</span>
               <button type="button" className="copy-button" onClick={handleCopyJsonPrompt}>
                 Copy JSON Prompt
               </button>
@@ -422,6 +568,20 @@ function App() {
               isLocked={lockedFields.scale}
               onToggleLock={() => toggleLock('scale')}
               onChange={(value) => updateResultField('scale', value)}
+            />
+            <EditableResultCard
+              title="Key Center"
+              value={result.keyCenter}
+              isLocked={lockedFields.keyCenter}
+              onToggleLock={() => toggleLock('keyCenter')}
+              onChange={(value) => updateResultField('keyCenter', value)}
+            />
+            <EditableResultCard
+              title="Chord Progression"
+              value={result.chordProgression}
+              isLocked={lockedFields.chordProgression}
+              onToggleLock={() => toggleLock('chordProgression')}
+              onChange={(value) => updateResultField('chordProgression', value)}
             />
             <EditableResultCard
               title="Signature Sound"
@@ -522,6 +682,44 @@ function App() {
                         'arrangement',
                         result.arrangement.map((entry, entryIndex) =>
                           entryIndex === index ? { ...entry, note: event.target.value } : entry
+                        )
+                      )
+                    }
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="palette-card">
+            <div className="card-heading">
+              <h3>Intensity Map</h3>
+              <LockButton
+                isLocked={lockedFields.intensityMap}
+                onClick={() => toggleLock('intensityMap')}
+              />
+            </div>
+            <div className="arrangement-list">
+              {result.intensityMap.map((item, index) => (
+                <div key={`${item.section}-intensity-${index}`} className="arrangement-item">
+                  <strong>{item.section}</strong>
+                  <input
+                    className="result-input"
+                    inputMode="numeric"
+                    value={String(item.level)}
+                    onChange={(event) =>
+                      updateResultField(
+                        'intensityMap',
+                        result.intensityMap.map((entry, entryIndex) =>
+                          entryIndex === index
+                            ? {
+                                ...entry,
+                                level: Math.min(
+                                  10,
+                                  Math.max(1, Number(event.target.value.replace(/[^\d]/g, '')) || 1)
+                                )
+                              }
+                            : entry
                         )
                       )
                     }
