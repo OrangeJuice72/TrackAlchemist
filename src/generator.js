@@ -34,6 +34,35 @@ const TEXTURE_MODIFIERS = [
 ];
 
 const FLAVOR_JOINERS = ['leaning', 'with touches of', 'cut with', 'pushed toward'];
+const FLAVOR_PREFIXES = ['Neo', 'Future', 'Raw', 'Noir', 'Lush', 'Hybrid', 'Left-Field', 'Midnight'];
+const FLAVOR_SUFFIXES = [
+  'Deluxe',
+  'Revival',
+  'Wave',
+  'Drive',
+  'Sessions',
+  'Club',
+  'Cinema',
+  'Pulse'
+];
+const SIGNATURE_EXTENSIONS = [
+  'through sharp automation moves',
+  'with contrast between dry and washed-out moments',
+  'framed by unusual percussion choices',
+  'with melodic fragments reappearing across sections',
+  'through bold call-and-response details',
+  'with a hybrid acoustic/electronic edge',
+  'through low-end movement that keeps shifting',
+  'with sections that bloom wider on each return'
+];
+const ADDITIONAL_SCALES = [
+  'Melodic Minor',
+  'Harmonic Major',
+  'Double Harmonic',
+  'Whole Tone',
+  'Hungarian Minor',
+  'Lydian Dominant'
+];
 const ROLE_TARGETS = ['rhythm', 'bass', 'lead', 'harmony', 'texture'];
 const ROLE_KEYWORDS = {
   rhythm: [
@@ -154,6 +183,14 @@ function sampleOne(items, random) {
   return items[Math.floor(random() * items.length)];
 }
 
+function normalizeRange(range) {
+  return JSON.stringify(range);
+}
+
+function uniqueRanges(ranges) {
+  return [...new Set(ranges.map(normalizeRange))].map((value) => JSON.parse(value));
+}
+
 function mergeWeighted(primaryItems, secondaryItems = [], primaryWeight = 50) {
   const primaryCopies = Math.max(1, Math.round(primaryWeight / 20));
   const secondaryCopies = Math.max(1, Math.round((100 - primaryWeight) / 20));
@@ -210,18 +247,98 @@ function combineGenres(primaryGenreKey, secondaryGenreKey, primaryWeight = 50) {
   const label = secondary
     ? `${primary.label} ${primaryWeight}/${100 - primaryWeight} ${secondary.label}`
     : primary.label;
+  const primaryFlavorGenres = expandFlavorPool(primary.flavorGenres, primary.label);
+  const secondaryFlavorGenres = secondary ? expandFlavorPool(secondary.flavorGenres, secondary.label) : [];
+  const primaryBpmRanges = expandBpmRanges(primary.bpmRanges);
+  const secondaryBpmRanges = secondary ? expandBpmRanges(secondary.bpmRanges) : [];
+  const primaryScales = expandScalePool(primary.scales);
+  const secondaryScales = secondary ? expandScalePool(secondary.scales) : [];
+  const primarySignatureSounds = expandSignaturePool(primary.signatureSounds, primary.label);
+  const secondarySignatureSounds = secondary
+    ? expandSignaturePool(secondary.signatureSounds, secondary.label)
+    : [];
 
   return {
     label,
-    flavorGenres: mergeWeighted(primary.flavorGenres, secondary?.flavorGenres, primaryWeight),
-    bpmRanges: mergeWeighted(primary.bpmRanges, secondary?.bpmRanges, primaryWeight),
-    scales: mergeWeighted(primary.scales, secondary?.scales, primaryWeight),
+    flavorGenres: mergeWeighted(primaryFlavorGenres, secondaryFlavorGenres, primaryWeight),
+    bpmRanges: mergeWeighted(primaryBpmRanges, secondaryBpmRanges, primaryWeight),
+    scales: mergeWeighted(primaryScales, secondaryScales, primaryWeight),
     instrumentationPalettes: uniqueByValue(
       mergeWeighted(primary.instrumentationPalettes, secondary?.instrumentationPalettes, primaryWeight)
     ),
-    signatureSounds: mergeWeighted(primary.signatureSounds, secondary?.signatureSounds, primaryWeight),
+    signatureSounds: mergeWeighted(primarySignatureSounds, secondarySignatureSounds, primaryWeight),
     energyFeels: mergeWeighted(primary.energyFeels, secondary?.energyFeels, primaryWeight)
   };
+}
+
+function expandFlavorPool(flavorGenres, genreLabel) {
+  const expanded = [...flavorGenres];
+
+  for (const flavor of flavorGenres) {
+    expanded.push(`${pickStatic(FLAVOR_PREFIXES, flavor)} ${flavor}`);
+    expanded.push(`${flavor} ${pickStatic(FLAVOR_SUFFIXES, `${flavor}-${genreLabel}`)}`);
+  }
+
+  return unique(expanded);
+}
+
+function expandScalePool(scales) {
+  const expanded = [...scales];
+
+  for (const scale of ADDITIONAL_SCALES) {
+    if (!expanded.includes(scale)) {
+      expanded.push(scale);
+    }
+  }
+
+  if (!expanded.includes('Minor')) {
+    expanded.push('Minor');
+  }
+
+  if (!expanded.includes('Aeolian')) {
+    expanded.push('Aeolian');
+  }
+
+  return unique(expanded);
+}
+
+function expandBpmRanges(ranges) {
+  const expanded = [...ranges];
+
+  for (const [min, max] of ranges) {
+    const midpoint = Math.round((min + max) / 2);
+    expanded.push([Math.max(40, midpoint - 4), midpoint + 4]);
+    expanded.push([Math.max(40, min - 3), Math.max(min + 2, max - 2)]);
+  }
+
+  for (let index = 0; index < ranges.length - 1; index += 1) {
+    const current = ranges[index];
+    const next = ranges[index + 1];
+    expanded.push([current[0], next[1]]);
+  }
+
+  return uniqueRanges(expanded);
+}
+
+function expandSignaturePool(signatureSounds, genreLabel) {
+  const expanded = [...signatureSounds];
+
+  for (const phrase of signatureSounds) {
+    expanded.push(`${phrase} ${pickStatic(SIGNATURE_EXTENSIONS, phrase)}`);
+    expanded.push(`${genreLabel} framing built around ${phrase.toLowerCase()}`);
+  }
+
+  return unique(expanded);
+}
+
+function pickStatic(pool, seedText) {
+  let hash = 0;
+
+  for (let index = 0; index < seedText.length; index += 1) {
+    hash = (hash * 31 + seedText.charCodeAt(index)) >>> 0;
+  }
+
+  return pool[hash % pool.length];
 }
 
 function buildFlavorGenre(flavorGenres, random) {
