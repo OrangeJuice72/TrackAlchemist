@@ -8,7 +8,13 @@ const favoritesStorageKey = 'trackalchemist-favorites';
 const vocalOptions = [
   { key: 'instrumental', label: 'Instrumental' },
   { key: 'male', label: 'Male' },
-  { key: 'female', label: 'Female' }
+  { key: 'female', label: 'Female' },
+  { key: 'male-female-duet', label: 'Male + Female Duet' },
+  { key: 'mixed-group', label: 'Mixed Group' },
+  { key: 'choir', label: 'Choir' },
+  { key: 'child', label: 'Child' },
+  { key: 'vocal-chops', label: 'Vocal Chops' },
+  { key: 'robotic', label: 'Robotic / Processed' }
 ];
 const promptTemplates = [
   { key: 'generic', label: 'Create a Song' },
@@ -62,6 +68,10 @@ function createPromptInclusions() {
 
 function createRandomSeed() {
   return `TA-${Math.random().toString(36).slice(2, 10).toUpperCase()}`;
+}
+
+function getVocalOptionLabel(vocalKey) {
+  return vocalOptions.find((option) => option.key === vocalKey)?.label ?? 'Instrumental';
 }
 
 function readFavorites() {
@@ -149,7 +159,7 @@ function buildPrompt({
   }
 
   if (isIncluded('vocals') && vocals) {
-    baseContext.push(`Vocals: ${vocals}.`);
+    baseContext.push(`Vocals: ${getVocalOptionLabel(vocals)}.`);
   }
 
   switch (promptTemplate) {
@@ -646,7 +656,7 @@ function App() {
             </div>
             <div className="result-actions">
               <span className="badge">{result.bpm} BPM</span>
-              <span className="badge">{vocalOptions.find((option) => option.key === vocals)?.label ?? 'Instrumental'}</span>
+              <span className="badge">{getVocalOptionLabel(vocals)}</span>
               <span className="badge">Seed {seedInput}</span>
               <button type="button" className="copy-button" onClick={handleCopyJsonPrompt}>
                 Copy Song JSON
