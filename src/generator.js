@@ -34,6 +34,76 @@ const TEXTURE_MODIFIERS = [
 ];
 
 const FLAVOR_JOINERS = ['leaning', 'with touches of', 'cut with', 'pushed toward'];
+const ROLE_TARGETS = ['rhythm', 'bass', 'lead', 'harmony', 'texture'];
+const ROLE_KEYWORDS = {
+  rhythm: [
+    'kick',
+    'snare',
+    'clap',
+    'hat',
+    'drum',
+    'perc',
+    'rim',
+    'tom',
+    'shaker',
+    'tambourine',
+    'cymbal',
+    'brush',
+    'claps'
+  ],
+  bass: ['808', 'sub', 'bass', 'low end', 'growl'],
+  lead: [
+    'lead',
+    'bell',
+    'pluck',
+    'guitar',
+    'piano',
+    'keys',
+    'rhodes',
+    'wurlitzer',
+    'clavinet',
+    'violin',
+    'cello',
+    'mandolin',
+    'banjo',
+    'hook',
+    'motif',
+    'synth'
+  ],
+  harmony: [
+    'chord',
+    'pad',
+    'organ',
+    'choir',
+    'strings',
+    'stack',
+    'piano',
+    'keys',
+    'rhodes',
+    'wurlitzer',
+    'guitar',
+    'synth',
+    'ambient'
+  ],
+  texture: [
+    'fx',
+    'noise',
+    'texture',
+    'crackle',
+    'delay',
+    'reverb',
+    'atmosphere',
+    'atmospheric',
+    'sweep',
+    'reverse',
+    'riser',
+    'impact',
+    'ambience',
+    'room',
+    'verb',
+    'candy'
+  ]
+};
 
 function xmur3(seed) {
   let hash = 1779033703 ^ seed.length;
@@ -78,6 +148,10 @@ function unique(items) {
 
 function uniqueByValue(items) {
   return [...new Set(items.map((item) => JSON.stringify(item)))].map((item) => JSON.parse(item));
+}
+
+function sampleOne(items, random) {
+  return items[Math.floor(random() * items.length)];
 }
 
 function mergeWeighted(primaryItems, secondaryItems = [], primaryWeight = 50) {
@@ -163,29 +237,50 @@ function buildFlavorGenre(flavorGenres, random) {
 }
 
 function buildInstrumentationPalette(instrumentationPalettes, random) {
-  const basePalette = [...pick(instrumentationPalettes, random)];
-  const allItems = unique(instrumentationPalettes.flat());
-  const swapCount = randomInt(1, Math.min(3, basePalette.length), random);
+  const localItems = unique(instrumentationPalettes.flat());
+  const globalItems = unique(Object.values(GENRE_DATA).flatMap((genre) => genre.instrumentationPalettes.flat()));
+  const weightedPool = [
+    ...localItems,
+    ...localItems,
+    ...localItems,
+    ...globalItems.filter((item) => !localItems.includes(item))
+  ];
+  const used = new Set();
+  const palette = [];
 
-  for (let index = 0; index < swapCount; index += 1) {
-    const replacementPool = allItems.filter((item) => !basePalette.includes(item));
+  const matchesRole = (item, role) => {
+    const normalized = item.toLowerCase();
+    return ROLE_KEYWORDS[role].some((keyword) => normalized.includes(keyword));
+  };
 
-    if (replacementPool.length === 0) {
-      break;
+  const takeForRole = (role) => {
+    const candidates = unique(weightedPool).filter((item) => !used.has(item) && matchesRole(item, role));
+
+    if (candidates.length === 0) {
+      return;
     }
 
-    const slot = Math.floor(random() * basePalette.length);
-    basePalette[slot] = pick(replacementPool, random);
+    const choice = sampleOne(candidates, random);
+    used.add(choice);
+    palette.push(choice);
+  };
+
+  for (const role of ROLE_TARGETS) {
+    takeForRole(role);
   }
 
-  const extras = allItems.filter((item) => !basePalette.includes(item));
-  const finalPalette = [...basePalette];
+  const desiredCount = randomInt(5, 7, random);
+  const wildcardPool = unique(weightedPool).filter((item) => !used.has(item));
 
-  if (extras.length > 0 && random() > 0.45) {
-    finalPalette.push(pick(extras, random));
+  while (palette.length < desiredCount && wildcardPool.length > 0) {
+    const index = Math.floor(random() * wildcardPool.length);
+    const choice = wildcardPool[index];
+    wildcardPool.splice(index, 1);
+    used.add(choice);
+    palette.push(choice);
   }
 
-  return finalPalette;
+  return palette;
 }
 
 function buildSignatureSound(signatureSounds, instrumentationPalette, energyFeels, moodTags, random) {
