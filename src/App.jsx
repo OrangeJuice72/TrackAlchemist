@@ -78,6 +78,47 @@ function buildIntensityText(intensityMap) {
   return intensityMap.map((item) => `${item.section} ${item.level}/10`).join(', ');
 }
 
+function buildDefaultIntensityMap(songStructure) {
+  const sections = songStructure
+    .split(' - ')
+    .map((section) => section.trim())
+    .filter(Boolean);
+
+  return sections.map((section, index) => {
+    const midpoint = sections.length / 2;
+    const base =
+      index === 0 ? 2 : index >= midpoint && index < sections.length - 1 ? 7 : index === sections.length - 1 ? 3 : 5;
+
+    return {
+      section,
+      level: base
+    };
+  });
+}
+
+function syncIntensityMapToStructure(songStructure, currentIntensityMap = []) {
+  const defaultMap = buildDefaultIntensityMap(songStructure);
+  const sectionLevels = currentIntensityMap.reduce((map, item) => {
+    const queue = map.get(item.section) ?? [];
+    queue.push(item.level);
+    map.set(item.section, queue);
+    return map;
+  }, new Map());
+
+  return defaultMap.map((item) => {
+    const queue = sectionLevels.get(item.section);
+
+    if (queue && queue.length > 0) {
+      return {
+        section: item.section,
+        level: queue.shift()
+      };
+    }
+
+    return item;
+  });
+}
+
 function buildPrompt({
   premise,
   referenceArtists,
@@ -270,7 +311,12 @@ function App() {
   const updateResultField = (field, value) => {
     setResult((currentResult) => ({
       ...currentResult,
-      [field]: value
+      [field]: value,
+      ...(field === 'songStructure'
+        ? {
+            intensityMap: syncIntensityMapToStructure(value, currentResult.intensityMap)
+          }
+        : {})
     }));
   };
 
