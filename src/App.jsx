@@ -6,11 +6,11 @@ import { generateIdea } from './generator.js';
 const genreEntries = Object.entries(GENRE_DATA);
 const favoritesStorageKey = 'trackalchemist-favorites';
 const promptTemplates = [
-  { key: 'generic', label: 'Generic Prompt' },
-  { key: 'chatgpt', label: 'ChatGPT Brief' },
-  { key: 'suno', label: 'Suno Prompt' },
-  { key: 'udio', label: 'Udio Prompt' },
-  { key: 'producer', label: 'Producer Brief' }
+  { key: 'generic', label: 'Create a Song' },
+  { key: 'chatgpt', label: 'Create a Song for ChatGPT' },
+  { key: 'suno', label: 'Create a Song for Suno' },
+  { key: 'udio', label: 'Create a Song for Udio' },
+  { key: 'producer', label: 'Create a Song for Production' }
 ];
 const lockableFields = [
   'flavorGenre',
@@ -143,7 +143,7 @@ function buildPrompt({
 
   switch (promptTemplate) {
     case 'chatgpt': {
-      const parts = ['Create a polished song brief and production plan.', ...baseContext];
+      const parts = ['Create a song with a polished production plan.', ...baseContext];
       if (isIncluded('mainGenre')) parts.push(`Genre blend: ${result.mainGenre}.`);
       if (isIncluded('flavorGenre')) parts.push(`Flavor genre: ${result.flavorGenre}.`);
       if (isIncluded('bpm')) parts.push(`Tempo: ${result.bpm} BPM.`);
@@ -180,7 +180,7 @@ function buildPrompt({
       return parts.join(' ');
     }
     case 'udio': {
-      const parts = ['Song prompt:', ...baseContext];
+      const parts = ['Create a song.', ...baseContext];
       if (isIncluded('mainGenre') && isIncluded('flavorGenre')) {
         parts.push(`${result.mainGenre} blend with ${result.flavorGenre} flavor.`);
       } else if (isIncluded('mainGenre')) {
@@ -207,7 +207,7 @@ function buildPrompt({
       return parts.join(' ');
     }
     case 'producer': {
-      const parts = ['Producer brief.', ...baseContext];
+      const parts = ['Create a song for production.', ...baseContext];
       if (isIncluded('mainGenre')) parts.push(`Blend ${result.mainGenre}.`);
       if (isIncluded('flavorGenre')) parts.push(`Flavor ${result.flavorGenre}.`);
       if (isIncluded('scale')) parts.push(`Scale ${result.scale}.`);
@@ -222,7 +222,7 @@ function buildPrompt({
       return parts.join(' ');
     }
     default: {
-      const parts = ['Create an original track concept.', ...baseContext];
+      const parts = ['Create a song.', ...baseContext];
       if (isIncluded('mainGenre')) parts.push(`${result.mainGenre} genre blend.`);
       if (isIncluded('flavorGenre')) parts.push(`${result.flavorGenre} flavor.`);
       if (isIncluded('bpm')) parts.push(`${result.bpm} BPM.`);
@@ -615,10 +615,10 @@ function App() {
               <span className="badge">{result.bpm} BPM</span>
               <span className="badge">Seed {seedInput}</span>
               <button type="button" className="copy-button" onClick={handleCopyJsonPrompt}>
-                Copy JSON Prompt
+                Copy Song JSON
               </button>
               <button type="button" className="copy-button" onClick={handleCopyPlainPrompt}>
-                Copy Plain Prompt
+                Copy Song Prompt
               </button>
             </div>
           </div>
@@ -659,7 +659,7 @@ function App() {
             </div>
 
             <div className="field-group">
-              <label htmlFor="prompt-template">Prompt Template</label>
+              <label htmlFor="prompt-template">Create a Song Template</label>
               <select
                 id="prompt-template"
                 value={promptTemplate}
@@ -675,7 +675,7 @@ function App() {
           </div>
 
           <div className="prompt-preview">
-            <p className="result-label">Prompt Snapshot</p>
+            <p className="result-label">Create a Song Snapshot</p>
             <p>{plainPrompt}</p>
           </div>
 
