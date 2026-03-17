@@ -35,7 +35,18 @@ export const GENRE_DATA = {
   },
   trap: {
     label: 'Trap',
-    flavorGenres: ['Melodic Trap', 'Dark Trap', 'Rage', 'Trap Soul'],
+    flavorGenres: [
+      'Melodic Trap',
+      'Dark Trap',
+      'Rage',
+      'Trap Soul',
+      'Drill Trap',
+      'Industrial Trap',
+      'Southern Trap',
+      'Space Trap',
+      'Orchestral Trap',
+      'Club Trap'
+    ],
     bpmRanges: [[120, 135], [138, 150], [70, 78], [80, 88]],
     scales: ['Natural Minor', 'Phrygian', 'Harmonic Minor', 'Locrian', 'Dorian', 'Minor Pentatonic'],
     instrumentationPalettes: [
@@ -56,7 +67,18 @@ export const GENRE_DATA = {
   },
   rnb: {
     label: 'R&B',
-    flavorGenres: ['Alt R&B', 'Contemporary R&B', 'Bedroom R&B', 'Neo-Soul R&B'],
+    flavorGenres: [
+      'Alt R&B',
+      'Contemporary R&B',
+      'Bedroom R&B',
+      'Neo-Soul R&B',
+      'Trap R&B',
+      'Ambient R&B',
+      'Electro R&B',
+      'Soul-Pop R&B',
+      'Late-Night R&B',
+      'Downtempo R&B'
+    ],
     bpmRanges: [[68, 78], [80, 92], [94, 108], [110, 118]],
     scales: ['Major', 'Natural Minor', 'Dorian', 'Mixolydian', 'Lydian', 'Major Pentatonic'],
     instrumentationPalettes: [
@@ -77,7 +99,18 @@ export const GENRE_DATA = {
   },
   pop: {
     label: 'Pop',
-    flavorGenres: ['Dance Pop', 'Synth Pop', 'Indie Pop', 'Dream Pop'],
+    flavorGenres: [
+      'Dance Pop',
+      'Synth Pop',
+      'Indie Pop',
+      'Dream Pop',
+      'Electro Pop',
+      'Alt Pop',
+      'Teen Pop',
+      'Power Pop',
+      'Art Pop',
+      'Pop Rock'
+    ],
     bpmRanges: [[96, 108], [110, 120], [122, 128], [130, 136]],
     scales: ['Major', 'Minor', 'Mixolydian', 'Lydian', 'Major Pentatonic', 'Dorian'],
     instrumentationPalettes: [
@@ -98,7 +131,18 @@ export const GENRE_DATA = {
   },
   kpop: {
     label: 'K-Pop',
-    flavorGenres: ['Bright K-Pop', 'Dark K-Pop', 'Future Pop K-Pop', 'Bubblegum K-Pop'],
+    flavorGenres: [
+      'Bright K-Pop',
+      'Dark K-Pop',
+      'Future Pop K-Pop',
+      'Bubblegum K-Pop',
+      'EDM K-Pop',
+      'R&B K-Pop',
+      'Hip-Hop K-Pop',
+      'Retro K-Pop',
+      'House K-Pop',
+      'Cinematic K-Pop'
+    ],
     bpmRanges: [[96, 110], [112, 124], [126, 136], [138, 150]],
     scales: ['Major', 'Minor', 'Dorian', 'Mixolydian', 'Lydian', 'Harmonic Minor'],
     instrumentationPalettes: [
@@ -119,7 +163,18 @@ export const GENRE_DATA = {
   },
   rock: {
     label: 'Rock',
-    flavorGenres: ['Alt Rock', 'Indie Rock', 'Arena Rock', 'Garage Rock'],
+    flavorGenres: [
+      'Alt Rock',
+      'Indie Rock',
+      'Arena Rock',
+      'Garage Rock',
+      'Hard Rock',
+      'Psychedelic Rock',
+      'Blues Rock',
+      'Post-Rock',
+      'Classic Rock',
+      'Grunge Rock'
+    ],
     bpmRanges: [[88, 102], [104, 118], [120, 132], [134, 150]],
     scales: ['Minor Pentatonic', 'Natural Minor', 'Major', 'Dorian', 'Mixolydian', 'Blues Scale'],
     instrumentationPalettes: [
@@ -140,7 +195,18 @@ export const GENRE_DATA = {
   },
   metal: {
     label: 'Metal',
-    flavorGenres: ['Metalcore', 'Thrash Metal', 'Dj ent', 'Symphonic Metal'],
+    flavorGenres: [
+      'Metalcore',
+      'Thrash Metal',
+      'Djent',
+      'Symphonic Metal',
+      'Death Metal',
+      'Black Metal',
+      'Industrial Metal',
+      'Progressive Metal',
+      'Groove Metal',
+      'Nu Metal'
+    ],
     bpmRanges: [[90, 110], [120, 140], [145, 170], [175, 210]],
     scales: ['Phrygian', 'Natural Minor', 'Harmonic Minor', 'Locrian', 'Chromatic', 'Phrygian Dominant'],
     instrumentationPalettes: [
@@ -161,7 +227,18 @@ export const GENRE_DATA = {
   },
   punk: {
     label: 'Punk',
-    flavorGenres: ['Pop Punk', 'Skate Punk', 'Post-Punk', 'Hardcore Punk'],
+    flavorGenres: [
+      'Pop Punk',
+      'Skate Punk',
+      'Post-Punk',
+      'Hardcore Punk',
+      'Emo Punk',
+      'Garage Punk',
+      'Street Punk',
+      'Melodic Hardcore',
+      'Surf Punk',
+      'Art Punk'
+    ],
     bpmRanges: [[120, 140], [145, 165], [170, 190], [95, 115]],
     scales: ['Major', 'Natural Minor', 'Mixolydian', 'Minor Pentatonic', 'Dorian', 'Blues Scale'],
     instrumentationPalettes: [
@@ -182,7 +259,18 @@ export const GENRE_DATA = {
   },
   country: {
     label: 'Country',
-    flavorGenres: ['Modern Country', 'Outlaw Country', 'Country Pop', 'Country Rock'],
+    flavorGenres: [
+      'Modern Country',
+      'Outlaw Country',
+      'Country Pop',
+      'Country Rock',
+      'Americana Country',
+      'Bluegrass Country',
+      'Honky-Tonk',
+      'Red Dirt Country',
+      'Southern Country',
+      'Acoustic Country'
+    ],
     bpmRanges: [[72, 84], [86, 98], [100, 114], [116, 128]],
     scales: ['Major', 'Mixolydian', 'Major Pentatonic', 'Minor Pentatonic', 'Dorian', 'Natural Minor'],
     instrumentationPalettes: [
@@ -203,7 +291,18 @@ export const GENRE_DATA = {
   },
   folk: {
     label: 'Folk',
-    flavorGenres: ['Indie Folk', 'Americana Folk', 'Chamber Folk', 'Acoustic Folk'],
+    flavorGenres: [
+      'Indie Folk',
+      'Americana Folk',
+      'Chamber Folk',
+      'Acoustic Folk',
+      'Singer-Songwriter Folk',
+      'Celtic Folk',
+      'Appalachian Folk',
+      'Folk Pop',
+      'Dark Folk',
+      'Contemporary Folk'
+    ],
     bpmRanges: [[65, 78], [80, 92], [94, 106], [108, 118]],
     scales: ['Major', 'Natural Minor', 'Dorian', 'Mixolydian', 'Major Pentatonic', 'Aeolian'],
     instrumentationPalettes: [
@@ -224,7 +323,18 @@ export const GENRE_DATA = {
   },
   soul: {
     label: 'Soul',
-    flavorGenres: ['Neo-Soul', 'Retro Soul', 'Gospel Soul', 'Psychedelic Soul'],
+    flavorGenres: [
+      'Neo-Soul',
+      'Retro Soul',
+      'Gospel Soul',
+      'Psychedelic Soul',
+      'Southern Soul',
+      'Modern Soul',
+      'Funk Soul',
+      'Orchestral Soul',
+      'Quiet Storm Soul',
+      'Blue-Eyed Soul'
+    ],
     bpmRanges: [[70, 82], [84, 96], [98, 110], [112, 122]],
     scales: ['Major', 'Dorian', 'Mixolydian', 'Natural Minor', 'Major Pentatonic', 'Blues Scale'],
     instrumentationPalettes: [
@@ -245,7 +355,18 @@ export const GENRE_DATA = {
   },
   funk: {
     label: 'Funk',
-    flavorGenres: ['P-Funk', 'Disco Funk', 'Electro Funk', 'Jazz Funk'],
+    flavorGenres: [
+      'P-Funk',
+      'Disco Funk',
+      'Electro Funk',
+      'Jazz Funk',
+      'G-Funk',
+      'Boogie Funk',
+      'Synth Funk',
+      'Retro Funk',
+      'Deep Funk',
+      'Fusion Funk'
+    ],
     bpmRanges: [[92, 104], [106, 118], [120, 128], [130, 138]],
     scales: ['Mixolydian', 'Dorian', 'Minor Pentatonic', 'Major Pentatonic', 'Blues Scale', 'Major'],
     instrumentationPalettes: [
@@ -266,7 +387,18 @@ export const GENRE_DATA = {
   },
   jazz: {
     label: 'Jazz',
-    flavorGenres: ['Smooth Jazz', 'Jazz Fusion', 'Modal Jazz', 'Loft Jazz'],
+    flavorGenres: [
+      'Smooth Jazz',
+      'Jazz Fusion',
+      'Modal Jazz',
+      'Loft Jazz',
+      'Bebop',
+      'Cool Jazz',
+      'Latin Jazz',
+      'Contemporary Jazz',
+      'Nu Jazz',
+      'Spiritual Jazz'
+    ],
     bpmRanges: [[68, 82], [84, 98], [100, 118], [120, 145]],
     scales: ['Dorian', 'Mixolydian', 'Lydian', 'Major', 'Melodic Minor', 'Whole Tone'],
     instrumentationPalettes: [
@@ -287,7 +419,18 @@ export const GENRE_DATA = {
   },
   lofi: {
     label: 'Lo-Fi',
-    flavorGenres: ['Lo-Fi Hip-Hop', 'Chillhop', 'Study Beats', 'Lo-Fi Jazz'],
+    flavorGenres: [
+      'Lo-Fi Hip-Hop',
+      'Chillhop',
+      'Study Beats',
+      'Lo-Fi Jazz',
+      'Sleepy Lo-Fi',
+      'Ambient Lo-Fi',
+      'Boom Bap Lo-Fi',
+      'Rainy Day Lo-Fi',
+      'Tape Lo-Fi',
+      'Cafe Lo-Fi'
+    ],
     bpmRanges: [[60, 72], [74, 84], [86, 94], [96, 104]],
     scales: ['Natural Minor', 'Dorian', 'Major 7 Mood', 'Major', 'Minor Pentatonic', 'Mixolydian'],
     instrumentationPalettes: [
@@ -308,7 +451,18 @@ export const GENRE_DATA = {
   },
   edm: {
     label: 'EDM',
-    flavorGenres: ['Festival EDM', 'Big Room', 'Future Bass', 'Melodic EDM'],
+    flavorGenres: [
+      'Festival EDM',
+      'Big Room',
+      'Future Bass',
+      'Melodic EDM',
+      'Progressive EDM',
+      'Electro House EDM',
+      'Bass EDM',
+      'Pop EDM',
+      'Dubstep EDM',
+      'Trance EDM'
+    ],
     bpmRanges: [[124, 128], [128, 132], [138, 150], [150, 160]],
     scales: ['Minor', 'Major', 'Dorian', 'Phrygian', 'Lydian', 'Mixolydian'],
     instrumentationPalettes: [
@@ -329,7 +483,18 @@ export const GENRE_DATA = {
   },
   house: {
     label: 'House',
-    flavorGenres: ['Deep House', 'Tech House', 'Piano House', 'Afro House'],
+    flavorGenres: [
+      'Deep House',
+      'Tech House',
+      'Piano House',
+      'Afro House',
+      'Soulful House',
+      'Progressive House',
+      'Minimal House',
+      'Jackin House',
+      'Organic House',
+      'Disco House'
+    ],
     bpmRanges: [[120, 124], [124, 126], [126, 128], [128, 130]],
     scales: ['Minor', 'Dorian', 'Mixolydian', 'Major', 'Phrygian', 'Minor Pentatonic'],
     instrumentationPalettes: [
@@ -350,7 +515,18 @@ export const GENRE_DATA = {
   },
   techno: {
     label: 'Techno',
-    flavorGenres: ['Minimal Techno', 'Peak-Time Techno', 'Industrial Techno', 'Melodic Techno'],
+    flavorGenres: [
+      'Minimal Techno',
+      'Peak-Time Techno',
+      'Industrial Techno',
+      'Melodic Techno',
+      'Acid Techno',
+      'Hard Techno',
+      'Detroit Techno',
+      'Raw Techno',
+      'Hypnotic Techno',
+      'Warehouse Techno'
+    ],
     bpmRanges: [[124, 128], [130, 136], [138, 145], [145, 152]],
     scales: ['Minor', 'Phrygian', 'Dorian', 'Locrian', 'Chromatic', 'Harmonic Minor'],
     instrumentationPalettes: [
@@ -371,7 +547,18 @@ export const GENRE_DATA = {
   },
   drumAndBass: {
     label: 'Drum & Bass',
-    flavorGenres: ['Liquid DnB', 'Neurofunk', 'Jump Up', 'Atmospheric DnB'],
+    flavorGenres: [
+      'Liquid DnB',
+      'Neurofunk',
+      'Jump Up',
+      'Atmospheric DnB',
+      'Dancefloor DnB',
+      'Techstep',
+      'Jungle DnB',
+      'Minimal DnB',
+      'Roller DnB',
+      'Halftime DnB'
+    ],
     bpmRanges: [[160, 168], [170, 174], [174, 178], [178, 182]],
     scales: ['Natural Minor', 'Dorian', 'Phrygian', 'Major', 'Harmonic Minor', 'Minor Pentatonic'],
     instrumentationPalettes: [
@@ -392,7 +579,18 @@ export const GENRE_DATA = {
   },
   ambient: {
     label: 'Ambient',
-    flavorGenres: ['Dark Ambient', 'Space Ambient', 'Meditation Ambient', 'Drone Ambient'],
+    flavorGenres: [
+      'Dark Ambient',
+      'Space Ambient',
+      'Meditation Ambient',
+      'Drone Ambient',
+      'Cinematic Ambient',
+      'Organic Ambient',
+      'Healing Ambient',
+      'Isolation Ambient',
+      'Ethereal Ambient',
+      'Minimal Ambient'
+    ],
     bpmRanges: [[50, 65], [66, 78], [79, 90], [91, 100]],
     scales: ['Major', 'Minor', 'Dorian', 'Lydian', 'Whole Tone', 'Aeolian'],
     instrumentationPalettes: [
@@ -413,7 +611,18 @@ export const GENRE_DATA = {
   },
   cinematic: {
     label: 'Cinematic',
-    flavorGenres: ['Trailer', 'Hybrid Orchestral', 'Epic Drama', 'Sci-Fi Score'],
+    flavorGenres: [
+      'Trailer',
+      'Hybrid Orchestral',
+      'Epic Drama',
+      'Sci-Fi Score',
+      'Dark Score',
+      'Adventure Score',
+      'Mystery Score',
+      'Fantasy Score',
+      'Action Score',
+      'Emotional Score'
+    ],
     bpmRanges: [[70, 88], [90, 105], [108, 124], [126, 140]],
     scales: ['Natural Minor', 'Harmonic Minor', 'Phrygian', 'Dorian', 'Aeolian', 'Locrian'],
     instrumentationPalettes: [
@@ -434,7 +643,18 @@ export const GENRE_DATA = {
   },
   reggae: {
     label: 'Reggae',
-    flavorGenres: ['Roots Reggae', 'Dub Reggae', 'Lovers Rock', 'Modern Reggae'],
+    flavorGenres: [
+      'Roots Reggae',
+      'Dub Reggae',
+      'Lovers Rock',
+      'Modern Reggae',
+      'Dancehall Reggae',
+      'Rub-a-Dub',
+      'Reggae Fusion',
+      'Steppers Reggae',
+      'Rockers Reggae',
+      'Conscious Reggae'
+    ],
     bpmRanges: [[68, 80], [82, 92], [94, 104], [106, 116]],
     scales: ['Major', 'Mixolydian', 'Dorian', 'Natural Minor', 'Major Pentatonic', 'Minor Pentatonic'],
     instrumentationPalettes: [
@@ -455,7 +675,18 @@ export const GENRE_DATA = {
   },
   afrobeats: {
     label: 'Afrobeats',
-    flavorGenres: ['Afro Pop', 'Afro Swing', 'Amapiano Afrobeats', 'Afro Fusion'],
+    flavorGenres: [
+      'Afro Pop',
+      'Afro Swing',
+      'Amapiano Afrobeats',
+      'Afro Fusion',
+      'Alt Afrobeats',
+      'Street Afrobeats',
+      'Romantic Afrobeats',
+      'Club Afrobeats',
+      'R&B Afrobeats',
+      'Dancehall Afrobeats'
+    ],
     bpmRanges: [[95, 105], [106, 112], [113, 118], [119, 124]],
     scales: ['Major', 'Minor', 'Mixolydian', 'Dorian', 'Major Pentatonic', 'Natural Minor'],
     instrumentationPalettes: [
@@ -476,7 +707,18 @@ export const GENRE_DATA = {
   },
   latin: {
     label: 'Latin',
-    flavorGenres: ['Latin Pop', 'Salsa Fusion', 'Bachata Pop', 'Latin Trap'],
+    flavorGenres: [
+      'Latin Pop',
+      'Salsa Fusion',
+      'Bachata Pop',
+      'Latin Trap',
+      'Merengue Pop',
+      'Regional Latin',
+      'Tropical Latin',
+      'Latin R&B',
+      'Latin Dance',
+      'Romantic Latin'
+    ],
     bpmRanges: [[88, 100], [102, 112], [114, 124], [126, 138]],
     scales: ['Major', 'Minor', 'Dorian', 'Mixolydian', 'Harmonic Minor', 'Major Pentatonic'],
     instrumentationPalettes: [
@@ -497,7 +739,18 @@ export const GENRE_DATA = {
   },
   reggaeton: {
     label: 'Reggaeton',
-    flavorGenres: ['Classic Reggaeton', 'Romantic Reggaeton', 'Dark Reggaeton', 'Club Reggaeton'],
+    flavorGenres: [
+      'Classic Reggaeton',
+      'Romantic Reggaeton',
+      'Dark Reggaeton',
+      'Club Reggaeton',
+      'Perreo',
+      'Pop Reggaeton',
+      'Trapeton',
+      'Afro Reggaeton',
+      'Melodic Reggaeton',
+      'Underground Reggaeton'
+    ],
     bpmRanges: [[88, 94], [95, 100], [101, 106], [107, 112]],
     scales: ['Minor', 'Major', 'Dorian', 'Phrygian', 'Natural Minor', 'Mixolydian'],
     instrumentationPalettes: [
@@ -518,7 +771,18 @@ export const GENRE_DATA = {
   },
   phonk: {
     label: 'Phonk',
-    flavorGenres: ['Drift Phonk', 'Cowbell Phonk', 'Memphis Phonk', 'Street Phonk'],
+    flavorGenres: [
+      'Drift Phonk',
+      'Cowbell Phonk',
+      'Memphis Phonk',
+      'Street Phonk',
+      'Dark Phonk',
+      'House Phonk',
+      'Hard Phonk',
+      'Lo-Fi Phonk',
+      'Aggressive Phonk',
+      'Underground Phonk'
+    ],
     bpmRanges: [[80, 92], [124, 136], [138, 150], [150, 165]],
     scales: ['Natural Minor', 'Phrygian', 'Harmonic Minor', 'Minor Pentatonic', 'Locrian', 'Aeolian'],
     instrumentationPalettes: [
