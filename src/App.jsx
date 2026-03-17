@@ -59,6 +59,13 @@ function createEmptyLocks() {
   }, {});
 }
 
+function createLockedState() {
+  return lockableFields.reduce((locks, field) => {
+    locks[field] = true;
+    return locks;
+  }, {});
+}
+
 function createPromptInclusions() {
   return promptFieldDefinitions.reduce((inclusions, field) => {
     inclusions[field.key] = true;
@@ -355,6 +362,35 @@ function App() {
       ...currentInclusions,
       [field]: !currentInclusions[field]
     }));
+  };
+
+  const randomizeResultFields = (fields) => {
+    const unlockedFields = Array.isArray(fields) ? fields : [fields];
+    const rerollLocks = createLockedState();
+
+    unlockedFields.forEach((field) => {
+      rerollLocks[field] = false;
+    });
+
+    setResult((previousResult) =>
+      generateIdea(
+        selectedGenre,
+        secondaryGenre,
+        rerollLocks,
+        previousResult,
+        blendWeight,
+        {},
+        `${seedInput || createRandomSeed()}-${Date.now()}-${unlockedFields.join('-')}`
+      )
+    );
+  };
+
+  const handleSeedRandomize = () => {
+    const nextSeed = createRandomSeed();
+    setSeedInput(nextSeed);
+    setResult((previousResult) =>
+      generateIdea(selectedGenre, secondaryGenre, lockedFields, previousResult, blendWeight, {}, nextSeed)
+    );
   };
 
   const handlePrimaryGenreChange = (event) => {
@@ -679,10 +715,13 @@ function App() {
             <div className="field-group">
               <div className="label-row">
                 <label htmlFor="seed-input">Generation Seed</label>
-                <PromptSwitch
-                  isEnabled={promptInclusions.seed}
-                  onClick={() => togglePromptInclusion('seed')}
-                />
+                <div className="control-chips">
+                  <PromptSwitch
+                    isEnabled={promptInclusions.seed}
+                    onClick={() => togglePromptInclusion('seed')}
+                  />
+                  <RandomizeButton onClick={handleSeedRandomize} />
+                </div>
               </div>
               <div className="seed-field">
                 <input
@@ -731,6 +770,7 @@ function App() {
               isPromptEnabled={promptInclusions.flavorGenre}
               onToggleLock={() => toggleLock('flavorGenre')}
               onTogglePrompt={() => togglePromptInclusion('flavorGenre')}
+              onRandomize={() => randomizeResultFields('flavorGenre')}
               onChange={(value) => updateResultField('flavorGenre', value)}
             />
             <EditableResultCard
@@ -740,6 +780,7 @@ function App() {
               isPromptEnabled={promptInclusions.scale}
               onToggleLock={() => toggleLock('scale')}
               onTogglePrompt={() => togglePromptInclusion('scale')}
+              onRandomize={() => randomizeResultFields('scale')}
               onChange={(value) => updateResultField('scale', value)}
             />
             <EditableResultCard
@@ -749,6 +790,7 @@ function App() {
               isPromptEnabled={promptInclusions.signatureSound}
               onToggleLock={() => toggleLock('signatureSound')}
               onTogglePrompt={() => togglePromptInclusion('signatureSound')}
+              onRandomize={() => randomizeResultFields('signatureSound')}
               onChange={(value) => updateResultField('signatureSound', value)}
               multiline
             />
@@ -759,6 +801,7 @@ function App() {
               isPromptEnabled={promptInclusions.era}
               onToggleLock={() => toggleLock('era')}
               onTogglePrompt={() => togglePromptInclusion('era')}
+              onRandomize={() => randomizeResultFields('era')}
               onChange={(value) => updateResultField('era', value)}
             />
             <EditableResultCard
@@ -768,6 +811,7 @@ function App() {
               isPromptEnabled={promptInclusions.moodTags}
               onToggleLock={() => toggleLock('moodTags')}
               onTogglePrompt={() => togglePromptInclusion('moodTags')}
+              onRandomize={() => randomizeResultFields('moodTags')}
               onChange={(value) =>
                 updateResultField(
                   'moodTags',
@@ -786,6 +830,7 @@ function App() {
               isPromptEnabled={promptInclusions.songStructure}
               onToggleLock={() => toggleLock('songStructure')}
               onTogglePrompt={() => togglePromptInclusion('songStructure')}
+              onRandomize={() => randomizeResultFields(['songStructure', 'intensityMap'])}
               onChange={(value) => updateResultField('songStructure', value)}
               multiline
             />
@@ -796,6 +841,7 @@ function App() {
               isPromptEnabled={promptInclusions.bpm}
               onToggleLock={() => toggleLock('bpm')}
               onTogglePrompt={() => togglePromptInclusion('bpm')}
+              onRandomize={() => randomizeResultFields('bpm')}
               onChange={(value) => updateResultField('bpm', value.replace(/[^\d]/g, ''))}
               inputMode="numeric"
             />
@@ -805,6 +851,7 @@ function App() {
             <div className="card-heading">
               <h3>Instrumentation Palette</h3>
               <div className="card-heading-actions">
+                <RandomizeButton onClick={() => randomizeResultFields('instrumentationPalette')} />
                 <PromptSwitch
                   isEnabled={promptInclusions.instrumentationPalette}
                   onClick={() => togglePromptInclusion('instrumentationPalette')}
@@ -834,6 +881,7 @@ function App() {
             <div className="card-heading">
               <h3>Intensity Map</h3>
               <div className="card-heading-actions">
+                <RandomizeButton onClick={() => randomizeResultFields('intensityMap')} />
                 <PromptSwitch
                   isEnabled={promptInclusions.intensityMap}
                   onClick={() => togglePromptInclusion('intensityMap')}
@@ -925,6 +973,7 @@ function EditableResultCard({
   isPromptEnabled,
   onToggleLock,
   onTogglePrompt,
+  onRandomize,
   onChange,
   multiline = false,
   inputMode
@@ -934,6 +983,7 @@ function EditableResultCard({
       <div className="card-heading">
         <p>{title}</p>
         <div className="card-heading-actions">
+          <RandomizeButton onClick={onRandomize} />
           <PromptSwitch isEnabled={isPromptEnabled} onClick={onTogglePrompt} />
           <LockButton isLocked={isLocked} onClick={onToggleLock} />
         </div>
@@ -976,6 +1026,14 @@ function LockButton({ isLocked, onClick }) {
       onClick={onClick}
     >
       {isLocked ? 'Locked' : 'Lock'}
+    </button>
+  );
+}
+
+function RandomizeButton({ onClick }) {
+  return (
+    <button type="button" className="randomize-button" onClick={onClick}>
+      Randomize
     </button>
   );
 }

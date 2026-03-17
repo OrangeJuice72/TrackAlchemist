@@ -282,6 +282,13 @@ label {
   gap: 12px;
 }
 
+.control-chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: end;
+}
+
 .label-row label {
   margin: 0;
 }
@@ -339,6 +346,7 @@ select:focus,
 
 .generate-button:hover,
 .copy-button:hover,
+.randomize-button:hover,
 .prompt-switch:hover,
 .lock-button:hover {
   transform: translateY(-1px);
@@ -415,6 +423,22 @@ select:focus,
   border: 1px solid rgba(162, 193, 255, 0.16);
   background: rgba(255, 255, 255, 0.04);
   color: var(--text-soft);
+  border-radius: 999px;
+  min-height: 34px;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: border-color 120ms ease, background 120ms ease, transform 120ms ease;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.randomize-button {
+  border: 1px solid rgba(115, 230, 255, 0.24);
+  background: rgba(115, 230, 255, 0.08);
+  color: #e6fbff;
   border-radius: 999px;
   min-height: 34px;
   padding: 6px 12px;
@@ -543,6 +567,10 @@ select:focus,
   }
 
   .card-heading-actions {
+    justify-content: start;
+  }
+
+  .control-chips {
     justify-content: start;
   }
 }
