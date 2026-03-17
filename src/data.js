@@ -1,7 +1,20 @@
 export const GENRE_DATA = {
   hipHop: {
     label: 'Hip-Hop',
-    flavorGenres: ['Boom Bap', 'Jazz Rap', 'Conscious Rap', 'Cloud Rap'],
+    flavorGenres: [
+      'Boom Bap',
+      'Jazz Rap',
+      'Conscious Rap',
+      'Cloud Rap',
+      'Drill',
+      'Alternative Hip-Hop',
+      'Underground Hip-Hop',
+      'Southern Hip-Hop',
+      'West Coast Hip-Hop',
+      'East Coast Hip-Hop',
+      'Experimental Hip-Hop',
+      'Lo-Fi Hip-Hop'
+    ],
     bpmRanges: [[70, 78], [82, 90], [92, 100], [130, 145]],
     scales: ['Natural Minor', 'Dorian', 'Phrygian', 'Harmonic Minor', 'Minor Pentatonic', 'Aeolian'],
     instrumentationPalettes: [
