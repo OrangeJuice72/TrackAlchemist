@@ -5,17 +5,6 @@ import { generateIdea } from './generator.js';
 
 const genreEntries = Object.entries(GENRE_DATA);
 const favoritesStorageKey = 'trackalchemist-favorites';
-const vocalOptions = [
-  { key: 'instrumental', label: 'Instrumental' },
-  { key: 'male', label: 'Male' },
-  { key: 'female', label: 'Female' },
-  { key: 'male-female-duet', label: 'Male + Female Duet' },
-  { key: 'mixed-group', label: 'Mixed Group' },
-  { key: 'choir', label: 'Choir' },
-  { key: 'child', label: 'Child' },
-  { key: 'vocal-chops', label: 'Vocal Chops' },
-  { key: 'robotic', label: 'Robotic / Processed' }
-];
 const promptTemplates = [
   { key: 'generic', label: 'Create a Song' },
   { key: 'chatgpt', label: 'Create a Song for ChatGPT' },
@@ -38,7 +27,6 @@ const lockableFields = [
 const promptFieldDefinitions = [
   { key: 'premise', label: 'Premise' },
   { key: 'referenceArtists', label: 'References' },
-  { key: 'vocals', label: 'Vocals' },
   { key: 'mainGenre', label: 'Main Genre' },
   { key: 'flavorGenre', label: 'Flavor Genre' },
   { key: 'bpm', label: 'BPM' },
@@ -75,10 +63,6 @@ function createPromptInclusions() {
 
 function createRandomSeed() {
   return `TA-${Math.random().toString(36).slice(2, 10).toUpperCase()}`;
-}
-
-function getVocalOptionLabel(vocalKey) {
-  return vocalOptions.find((option) => option.key === vocalKey)?.label ?? 'Instrumental';
 }
 
 function readFavorites() {
@@ -145,7 +129,6 @@ function syncIntensityMapToStructure(songStructure, currentIntensityMap = []) {
 function buildPrompt({
   premise,
   referenceArtists,
-  vocals,
   result,
   promptTemplate,
   seedInput,
@@ -163,10 +146,6 @@ function buildPrompt({
 
   if (isIncluded('referenceArtists') && referenceArtists) {
     baseContext.push(`Reference artists or producers: ${referenceArtists}.`);
-  }
-
-  if (isIncluded('vocals') && vocals) {
-    baseContext.push(`Vocals: ${getVocalOptionLabel(vocals)}.`);
   }
 
   switch (promptTemplate) {
@@ -273,7 +252,6 @@ function App() {
   const initialSeed = useMemo(() => createRandomSeed(), []);
   const [selectedGenre, setSelectedGenre] = useState(genreEntries[0][0]);
   const [secondaryGenre, setSecondaryGenre] = useState('');
-  const [vocals, setVocals] = useState('instrumental');
   const [blendWeight, setBlendWeight] = useState(65);
   const [seedInput, setSeedInput] = useState(initialSeed);
   const [seedLocked, setSeedLocked] = useState(false);
@@ -300,7 +278,6 @@ function App() {
   const plainPrompt = buildPrompt({
     premise,
     referenceArtists,
-    vocals,
     result,
     promptTemplate,
     seedInput,
@@ -458,7 +435,6 @@ function App() {
           }
         : null,
       blendWeight,
-      vocals,
       seedLocked,
       lockedFields,
       promptInclusions,
@@ -506,7 +482,6 @@ function App() {
         selectedGenre,
         secondaryGenre,
         blendWeight,
-        vocals,
         seedInput,
         seedLocked,
         promptTemplate,
@@ -527,7 +502,6 @@ function App() {
     setSelectedGenre(favorite.selectedGenre);
     setSecondaryGenre(favorite.secondaryGenre);
     setBlendWeight(favorite.blendWeight);
-    setVocals(favorite.vocals ?? 'instrumental');
     setSeedInput(favorite.seedInput ?? createRandomSeed());
     setSeedLocked(Boolean(favorite.seedLocked));
     setPromptTemplate(favorite.promptTemplate ?? 'generic');
@@ -582,23 +556,6 @@ function App() {
                 {genreEntries.map(([key, value]) => (
                   <option key={key} value={key}>
                     {value.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="field-group">
-              <div className="label-row">
-                <label htmlFor="vocals-select">Vocals</label>
-                <PromptSwitch
-                  isEnabled={promptInclusions.vocals}
-                  onClick={() => togglePromptInclusion('vocals')}
-                />
-              </div>
-              <select id="vocals-select" value={vocals} onChange={(event) => setVocals(event.target.value)}>
-                {vocalOptions.map((option) => (
-                  <option key={option.key} value={option.key}>
-                    {option.label}
                   </option>
                 ))}
               </select>
@@ -692,7 +649,6 @@ function App() {
             </div>
             <div className="result-actions">
               <span className="badge">{result.bpm} BPM</span>
-              <span className="badge">{getVocalOptionLabel(vocals)}</span>
               <span className="badge">Seed {seedInput}</span>
               <button type="button" className="copy-button" onClick={handleCopyJsonPrompt}>
                 Copy Song JSON
