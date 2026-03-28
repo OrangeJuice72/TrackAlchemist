@@ -178,11 +178,19 @@ export function createIdea(
     }
 
     if (category.key === "fx") {
-      if (shouldUpdate) {
-        const primary = randomFrom(category.items);
-        const secondaryPool = category.items.filter((item) => item !== primary);
-        fields[category.key] = primary;
-        fxSecondary = secondaryPool.length > 0 ? randomFrom(secondaryPool) : primary;
+      if (shouldUpdate || singleKey === "fxSecondary") {
+        const currentPrimary = fields[category.key] ?? randomFrom(category.items);
+
+        if (singleKey === "fxSecondary") {
+          const secondaryPool = category.items.filter((item) => item !== currentPrimary);
+          fxSecondary = secondaryPool.length > 0 ? randomFrom(secondaryPool) : currentPrimary;
+        } else {
+          const primary = randomFrom(category.items);
+          const secondaryPool = category.items.filter((item) => item !== primary);
+          fields[category.key] = primary;
+          fxSecondary = secondaryPool.length > 0 ? randomFrom(secondaryPool) : primary;
+        }
+
         fxPrimaryEnabled = previousIdea?.fxPrimaryEnabled ?? true;
         fxSecondaryEnabled = previousIdea?.fxSecondaryEnabled ?? true;
       }

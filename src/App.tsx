@@ -412,6 +412,12 @@ function App() {
     });
   }
 
+  function handleRerollFxChain(chain: "primary" | "secondary") {
+    setCurrentIdea((previous) =>
+      createIdea(categories, previous, chain === "primary" ? "fx" : "fxSecondary"),
+    );
+  }
+
   function handleToggleConceptPart(part: ConceptPartKey) {
     setCurrentIdea((previous) => {
       if (!previous) {
@@ -602,6 +608,13 @@ function App() {
                         <div>
                           <span>Primary chain</span>
                           <div className="inline-chain">
+                            <button
+                              type="button"
+                              className="icon-button"
+                              onClick={() => handleRerollFxChain("primary")}
+                            >
+                              ⟳
+                            </button>
                             <strong>
                               {currentIdea?.fxPrimaryEnabled ? currentIdea?.fields.fx ?? "" : "OFF"}
                             </strong>
@@ -616,6 +629,13 @@ function App() {
                         <div>
                           <span>Secondary chain</span>
                           <div className="inline-chain">
+                            <button
+                              type="button"
+                              className="icon-button"
+                              onClick={() => handleRerollFxChain("secondary")}
+                            >
+                              ⟳
+                            </button>
                             <strong>
                               {currentIdea?.fxSecondaryEnabled ? currentIdea?.fxSecondary ?? "" : "OFF"}
                             </strong>
