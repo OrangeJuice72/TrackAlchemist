@@ -184,6 +184,9 @@ export function createIdea(
         if (singleKey === "fxSecondary") {
           const secondaryPool = category.items.filter((item) => item !== currentPrimary);
           fxSecondary = secondaryPool.length > 0 ? randomFrom(secondaryPool) : currentPrimary;
+        } else if (singleKey === "fx") {
+          const nextPrimary = randomFrom(category.items);
+          fields[category.key] = nextPrimary;
         } else {
           const primary = randomFrom(category.items);
           const secondaryPool = category.items.filter((item) => item !== primary);
